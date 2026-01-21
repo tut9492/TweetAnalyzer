@@ -103,6 +103,344 @@ const STYLES = {
   },
 };
 
+// Comprehensive spell checker dictionary
+const SPELLING_FIXES = {
+  // Common misspellings
+  'teh': 'the', 'thier': 'their', 'recieve': 'receive', 'occured': 'occurred',
+  'seperate': 'separate', 'definately': 'definitely', 'occassion': 'occasion',
+  'untill': 'until', 'wierd': 'weird', 'acheive': 'achieve', 'beleive': 'believe',
+  'concious': 'conscious', 'enviroment': 'environment', 'goverment': 'government',
+  'immedietly': 'immediately', 'neccessary': 'necessary', 'occurence': 'occurrence',
+  'posession': 'possession', 'recomend': 'recommend', 'succesful': 'successful',
+  'tommorow': 'tomorrow', 'truely': 'truly', 'accomodate': 'accommodate',
+  'apparantly': 'apparently', 'begining': 'beginning', 'calender': 'calendar',
+  'collegue': 'colleague', 'commited': 'committed', 'embarass': 'embarrass',
+  'existance': 'existence', 'familar': 'familiar', 'finaly': 'finally',
+  'foward': 'forward', 'freind': 'friend', 'gaurd': 'guard', 'happend': 'happened',
+  'harrass': 'harass', 'heighth': 'height', 'heros': 'heroes', 'hygeine': 'hygiene',
+  'ignorence': 'ignorance', 'independant': 'independent', 'inteligent': 'intelligent',
+  'intresting': 'interesting', 'knowlege': 'knowledge', 'liason': 'liaison',
+  'libary': 'library', 'lisense': 'license', 'maintainance': 'maintenance',
+  'millenium': 'millennium', 'minature': 'miniature', 'mischievious': 'mischievous',
+  'noticable': 'noticeable', 'ocasionally': 'occasionally', 'occurrance': 'occurrence',
+  'offical': 'official', 'oportunity': 'opportunity', 'orignal': 'original',
+  'particulary': 'particularly', 'passtime': 'pastime', 'perseverence': 'perseverance',
+  'personnell': 'personnel', 'posible': 'possible', 'preceed': 'precede',
+  'predjudice': 'prejudice', 'privelege': 'privilege', 'profesional': 'professional',
+  'promis': 'promise', 'publically': 'publicly', 'realy': 'really',
+  'reccomend': 'recommend', 'referance': 'reference', 'relevent': 'relevant',
+  'religous': 'religious', 'remeber': 'remember', 'repetition': 'repetition',
+  'resistence': 'resistance', 'responsiblity': 'responsibility', 'rythm': 'rhythm',
+  'sacrafice': 'sacrifice', 'safty': 'safety', 'sandwhich': 'sandwich',
+  'schudule': 'schedule', 'sentance': 'sentence', 'similer': 'similar',
+  'sincerly': 'sincerely', 'speach': 'speech', 'strenght': 'strength',
+  'suprise': 'surprise', 'temperture': 'temperature', 'tendancy': 'tendency',
+  'therefor': 'therefore', 'threshhold': 'threshold', 'tounge': 'tongue',
+  'unfortunatly': 'unfortunately', 'usualy': 'usually', 'vaccuum': 'vacuum',
+  'vehical': 'vehicle', 'visable': 'visible', 'wether': 'whether',
+  'writting': 'writing', 'yeild': 'yield',
+  // Contractions
+  'dont': "don't", 'doesnt': "doesn't", 'didnt': "didn't", 'cant': "can't",
+  'wont': "won't", 'im': "I'm", 'ive': "I've", 'youre': "you're",
+  'theyre': "they're", 'weve': "we've", 'youve': "you've", 'theyve': "they've",
+  'isnt': "isn't", 'arent': "aren't", 'wasnt': "wasn't", 'werent': "weren't",
+  'hasnt': "hasn't", 'havent': "haven't", 'hadnt': "hadn't", 'wouldnt': "wouldn't",
+  'couldnt': "couldn't", 'shouldnt': "shouldn't", 'lets': "let's",
+  'hes': "he's", 'shes': "she's", 'thats': "that's", 'whats': "what's",
+  'whos': "who's", 'wheres': "where's", 'heres': "here's", 'theres': "there's",
+  // Common Twitter/tech typos
+  'twtter': 'twitter', 'twiter': 'twitter', 'ethereum': 'Ethereum', 'etherium': 'Ethereum',
+  'bitcoing': 'bitcoin', 'bitcion': 'bitcoin', 'defi': 'DeFi', 'nft': 'NFT',
+  'nfts': 'NFTs', 'ai': 'AI', 'gpt': 'GPT', 'llm': 'LLM', 'api': 'API',
+  'saas': 'SaaS', 'b2b': 'B2B', 'b2c': 'B2C', 'roi': 'ROI', 'kpi': 'KPI',
+  'ceo': 'CEO', 'cto': 'CTO', 'cfo': 'CFO', 'vp': 'VP', 'pr': 'PR',
+  'ipo': 'IPO', 'vc': 'VC', 'yc': 'YC', 'techonology': 'technology',
+  'technolgy': 'technology', 'sofware': 'software', 'developement': 'development',
+  'develepment': 'development', 'programing': 'programming', 'algorythm': 'algorithm',
+  'databse': 'database', 'framwork': 'framework', 'libray': 'library',
+  'simultanesouly': 'simultaneously', 'simultanously': 'simultaneously',
+  'overwhlemed': 'overwhelmed', 'overwheled': 'overwhelmed', 'excitment': 'excitement',
+  'mor': 'more', 'thn': 'than', 'becuase': 'because', 'beacuse': 'because',
+  'alot': 'a lot', 'aswell': 'as well', 'eachother': 'each other',
+  'everytime': 'every time', 'infact': 'in fact', 'infront': 'in front',
+  'alright': 'all right', 'noone': 'no one', 'somthing': 'something',
+  'anythign': 'anything', 'everythign': 'everything', 'nothign': 'nothing',
+};
+
+// Grammar pattern detection
+function detectGrammarIssues(text) {
+  const issues = [];
+
+  // Detect "I don't [noun]" missing verb (e.g., "I don't CT" should be "I don't think CT")
+  const missingVerbPattern = /\bI don'?t\s+(?!think|believe|know|see|feel|want|need|like|have|get|make|let|say|go|come|take|give|find|tell|ask|use|try|leave|call|keep|put|mean|become|seem|appear|look|show|hear|play|run|move|live|work|read|learn|change|follow|stop|start|begin|pay|meet|include|continue|set|add|expect|build|stay|fall|send|return|bring|raise|pass|reach|buy|cut|offer|remember|consider|understand|create|speak|hold|spend|grow|open|walk|win|teach|watch|lose|turn|produce|lead|stand|drive|sit|wait|cover|pick|matter|cost|break|happen|agree|support|develop|carry|claim|receive|kill|remain|suggest|require|decide|enjoy|pull|reduce|note|report|miss|suppose|write|love|listen)\b/gi;
+  const missingVerbMatches = text.match(missingVerbPattern);
+  if (missingVerbMatches) {
+    issues.push({
+      type: 'missing_word',
+      text: missingVerbMatches[0],
+      suggestion: `${missingVerbMatches[0].replace(/don'?t\s+/i, "don't think ")}`,
+      message: 'Possibly missing verb after "don\'t"',
+    });
+  }
+
+  // Detect double words (e.g., "the the", "is is")
+  const doubleWordPattern = /\b(\w+)\s+\1\b/gi;
+  let match;
+  while ((match = doubleWordPattern.exec(text)) !== null) {
+    issues.push({
+      type: 'double_word',
+      text: match[0],
+      suggestion: match[1],
+      message: `Repeated word: "${match[1]}"`,
+    });
+  }
+
+  // Detect "atthe", "tothe", "inthe" etc. (merged words)
+  const mergedWordsPattern = /\b(at|to|in|on|of|for|by|with|from|into)(the|a|an|this|that|my|your|his|her|their|our)\b/gi;
+  while ((match = mergedWordsPattern.exec(text)) !== null) {
+    issues.push({
+      type: 'merged_words',
+      text: match[0],
+      suggestion: `${match[1]} ${match[2]}`,
+      message: `Missing space: "${match[0]}" → "${match[1]} ${match[2]}"`,
+    });
+  }
+
+  // Detect missing "I" capitalization
+  if (/\bi\b/.test(text) && !/\bi\.\w/i.test(text)) { // exclude things like "i.e."
+    issues.push({
+      type: 'capitalization',
+      text: ' i ',
+      suggestion: ' I ',
+      message: 'Lowercase "i" should be capitalized',
+    });
+  }
+
+  // Detect sentences not starting with capital
+  const sentencePattern = /(?:^|[.!?]\s+)([a-z])/g;
+  while ((match = sentencePattern.exec(text)) !== null) {
+    if (match.index > 0 || match[1] !== text[0]) { // Skip if it's a style choice at start
+      issues.push({
+        type: 'capitalization',
+        text: match[0],
+        suggestion: match[0].toUpperCase(),
+        message: 'Sentence should start with capital letter',
+      });
+    }
+  }
+
+  return issues;
+}
+
+// Find spelling errors in text
+function findSpellingErrors(text) {
+  const errors = [];
+  const words = text.match(/\b[a-zA-Z]+\b/g) || [];
+
+  words.forEach(word => {
+    const lower = word.toLowerCase();
+    if (SPELLING_FIXES[lower]) {
+      errors.push({
+        type: 'spelling',
+        text: word,
+        suggestion: SPELLING_FIXES[lower],
+        message: `Spelling: "${word}" → "${SPELLING_FIXES[lower]}"`,
+      });
+    }
+  });
+
+  return errors;
+}
+
+// Generate multiple rewrite variations
+function generateRewriteVariations(text) {
+  if (!text.trim()) return null;
+
+  let fixedOnly = text;
+  let engagementOptimized = text;
+  let punchyViral = text;
+
+  // === FIXED ONLY VERSION ===
+  // Apply spelling fixes
+  Object.entries(SPELLING_FIXES).forEach(([wrong, right]) => {
+    const regex = new RegExp(`\\b${wrong}\\b`, 'gi');
+    fixedOnly = fixedOnly.replace(regex, (match) => {
+      if (match[0] === match[0].toUpperCase()) {
+        return right.charAt(0).toUpperCase() + right.slice(1);
+      }
+      return right;
+    });
+  });
+
+  // Fix merged words
+  fixedOnly = fixedOnly.replace(/\b(at|to|in|on|of|for|by|with|from|into)(the|a|an|this|that|my|your|his|her|their|our)\b/gi, '$1 $2');
+
+  // Fix double words
+  fixedOnly = fixedOnly.replace(/\b(\w+)\s+\1\b/gi, '$1');
+
+  // Capitalize I
+  fixedOnly = fixedOnly.replace(/\bi\b/g, 'I');
+
+  // Capitalize sentence starts
+  fixedOnly = fixedOnly.replace(/(^|[.!?]\s+)([a-z])/g, (m, p1, p2) => p1 + p2.toUpperCase());
+
+  // Fix double spaces
+  fixedOnly = fixedOnly.replace(/  +/g, ' ');
+
+  // Fix common missing verbs
+  fixedOnly = fixedOnly.replace(/\bI don'?t\s+([A-Z][A-Za-z]*)\s+is\b/gi, "I don't think $1 is");
+  fixedOnly = fixedOnly.replace(/\bI don'?t\s+([A-Z][A-Za-z]*)\s+are\b/gi, "I don't think $1 are");
+  fixedOnly = fixedOnly.replace(/\bI don'?t\s+([A-Z][A-Za-z]*)\s+will\b/gi, "I don't think $1 will");
+  fixedOnly = fixedOnly.replace(/\bI don'?t\s+([A-Z][A-Za-z]*)\s+can\b/gi, "I don't think $1 can");
+
+  // === ENGAGEMENT OPTIMIZED VERSION ===
+  engagementOptimized = fixedOnly;
+
+  // Remove excess hashtags (keep max 1)
+  const hashtags = engagementOptimized.match(/#\w+/g) || [];
+  if (hashtags.length > 1) {
+    hashtags.slice(1).forEach(tag => {
+      engagementOptimized = engagementOptimized.replace(tag, '').trim();
+    });
+  }
+
+  // Add line breaks for readability
+  if (!engagementOptimized.includes('\n') && engagementOptimized.length > 100) {
+    const sentences = engagementOptimized.match(/[^.!?]+[.!?]+/g) || [engagementOptimized];
+    if (sentences.length > 1) {
+      engagementOptimized = sentences.map(s => s.trim()).join('\n\n');
+    }
+  }
+
+  // Add engagement hook if no question
+  if (!engagementOptimized.includes('?') && engagementOptimized.length < 250) {
+    const hooks = ['\n\nThoughts?', '\n\nAgree?', '\n\nAnyone else feel this?', '\n\nWhat do you think?'];
+    engagementOptimized = engagementOptimized.trim() + hooks[Math.floor(Math.random() * hooks.length)];
+  }
+
+  engagementOptimized = engagementOptimized.replace(/\n{3,}/g, '\n\n').trim();
+
+  // === PUNCHY VIRAL VERSION ===
+  punchyViral = fixedOnly;
+
+  // Remove all hashtags
+  punchyViral = punchyViral.replace(/#\w+/g, '').trim();
+
+  // Remove links
+  punchyViral = punchyViral.replace(/https?:\/\/\S+/g, '').trim();
+
+  // Make it choppy
+  if (!punchyViral.includes('\n')) {
+    punchyViral = punchyViral.replace(/\. /g, '.\n\n');
+  }
+
+  // Add provocative opener if none
+  const hasStrongOpen = /^(Hot take|Unpopular opinion|Controversial|Truth bomb|Hard truth|Nobody talks about|The real reason|Stop |Here's what|Most people|I'm convinced)/i.test(punchyViral);
+  if (!hasStrongOpen && punchyViral.length < 220) {
+    const hooks = ['Hot take: ', 'Unpopular opinion: ', 'Hard truth: '];
+    const hook = hooks[Math.floor(Math.random() * hooks.length)];
+    punchyViral = hook + punchyViral.charAt(0).toLowerCase() + punchyViral.slice(1);
+  }
+
+  // Add provocative closer
+  if (!punchyViral.includes('?') && punchyViral.length < 240) {
+    const closers = ['\n\nChange my mind.', '\n\nProve me wrong.', '\n\nFight me on this.'];
+    punchyViral = punchyViral.trim() + closers[Math.floor(Math.random() * closers.length)];
+  }
+
+  punchyViral = punchyViral.replace(/\n{3,}/g, '\n\n').trim();
+  if (punchyViral.length > 280) {
+    punchyViral = punchyViral.substring(0, 277) + '...';
+  }
+
+  return {
+    fixed: fixedOnly,
+    engagement: engagementOptimized,
+    punchy: punchyViral,
+  };
+}
+
+// Generate smart suggestions based on content
+function generateSmartSuggestions(text) {
+  const suggestions = [];
+
+  if (!text.trim()) return suggestions;
+
+  // Check for questions
+  if (!text.includes('?')) {
+    suggestions.push({
+      type: 'engagement',
+      priority: 'high',
+      message: 'Add a question to boost replies',
+      detail: 'Questions get 13.5x weight per reply, 75x if you respond',
+    });
+  }
+
+  // Check for hashtags
+  const hashtagCount = (text.match(/#\w+/g) || []).length;
+  if (hashtagCount > 1) {
+    suggestions.push({
+      type: 'penalty',
+      priority: 'high',
+      message: `Remove ${hashtagCount - 1} hashtag(s)`,
+      detail: 'Multiple hashtags trigger -40% reach penalty',
+    });
+  }
+
+  // Check for links
+  if (text.includes('http://') || text.includes('https://')) {
+    suggestions.push({
+      type: 'penalty',
+      priority: 'medium',
+      message: 'External link detected',
+      detail: 'Links get -30-50% reach penalty. Put in reply or bio instead',
+    });
+  }
+
+  // Check length
+  if (text.length < 50) {
+    suggestions.push({
+      type: 'improvement',
+      priority: 'low',
+      message: 'Tweet is very short',
+      detail: 'Longer tweets (100-200 chars) often perform better',
+    });
+  }
+
+  // Check for line breaks
+  if (text.length > 150 && !text.includes('\n')) {
+    suggestions.push({
+      type: 'improvement',
+      priority: 'medium',
+      message: 'Add line breaks for readability',
+      detail: 'Choppy format is easier to read and performs better',
+    });
+  }
+
+  // Check for ALL CAPS
+  if (/[A-Z]{4,}/.test(text)) {
+    suggestions.push({
+      type: 'penalty',
+      priority: 'medium',
+      message: 'ALL CAPS detected',
+      detail: 'Excessive caps can trigger spam filters',
+    });
+  }
+
+  // Check for strong hook
+  const hasHook = /^(Hot take|Unpopular opinion|I |Here's|The |Stop |Most |Nobody |Thread|Breaking|Just |This |Why |How |What )/i.test(text);
+  if (!hasHook && text.length > 50) {
+    suggestions.push({
+      type: 'improvement',
+      priority: 'low',
+      message: 'Consider a stronger opening hook',
+      detail: 'First line determines if people keep reading',
+    });
+  }
+
+  return suggestions;
+}
+
 // Utility functions
 function analyzeTweetText(text) {
   const analysis = {
@@ -812,27 +1150,12 @@ export default function App() {
     return structure.join('\n');
   };
 
-  // Grammar and spelling fixes
+  // Grammar and spelling fixes - uses comprehensive SPELLING_FIXES dictionary
   const fixGrammarAndSpelling = () => {
     let text = tweetText;
 
-    // Common spelling fixes
-    const spellingFixes = {
-      'teh': 'the', 'thier': 'their', 'recieve': 'receive', 'occured': 'occurred',
-      'seperate': 'separate', 'definately': 'definitely', 'occassion': 'occasion',
-      'untill': 'until', 'wierd': 'weird', 'acheive': 'achieve', 'beleive': 'believe',
-      'concious': 'conscious', 'enviroment': 'environment', 'goverment': 'government',
-      'immedietly': 'immediately', 'neccessary': 'necessary', 'occurence': 'occurrence',
-      'posession': 'possession', 'recomend': 'recommend', 'succesful': 'successful',
-      'tommorow': 'tomorrow', 'truely': 'truly', 'accomodate': 'accommodate',
-      'apparantly': 'apparently', 'begining': 'beginning', 'calender': 'calendar',
-      'collegue': 'colleague', 'commited': 'committed', 'dont': "don't", 'doesnt': "doesn't",
-      'didnt': "didn't", 'cant': "can't", 'wont': "won't", 'im': "I'm", 'ive': "I've",
-      'youre': "you're", 'theyre': "they're", 'its a': "it's a", 'alot': 'a lot',
-    };
-
-    // Apply spelling fixes (case-insensitive)
-    Object.entries(spellingFixes).forEach(([wrong, right]) => {
+    // Apply comprehensive spelling fixes (case-insensitive)
+    Object.entries(SPELLING_FIXES).forEach(([wrong, right]) => {
       const regex = new RegExp(`\\b${wrong}\\b`, 'gi');
       text = text.replace(regex, (match) => {
         // Preserve original case for first letter
@@ -842,6 +1165,16 @@ export default function App() {
         return right;
       });
     });
+
+    // Fix merged words (e.g., "atthe" -> "at the")
+    text = text.replace(/\b(at|to|in|on|of|for|by|with|from|into)(the|a|an|this|that|my|your|his|her|their|our)\b/gi, '$1 $2');
+
+    // Fix double words (e.g., "the the" -> "the")
+    text = text.replace(/\b(\w+)\s+\1\b/gi, '$1');
+
+    // Fix common missing verbs (e.g., "I don't CT is" -> "I don't think CT is")
+    text = text.replace(/\bI don'?t\s+([A-Z][A-Za-z]*)\s+(is|are|will|can|was|were|has|have|should|would|could)\b/gi,
+      (match, noun, verb) => `I don't think ${noun} ${verb}`);
 
     // Capitalize first letter of sentences
     text = text.replace(/(^|[.!?]\s+)([a-z])/g, (match, p1, p2) => p1 + p2.toUpperCase());
@@ -854,6 +1187,10 @@ export default function App() {
 
     // Fix space before punctuation
     text = text.replace(/\s+([.,!?])/g, '$1');
+
+    // Fix "its a" -> "it's a" (common mistake)
+    text = text.replace(/\bits a\b/gi, "it's a");
+    text = text.replace(/\bits the\b/gi, "it's the");
 
     setTweetText(text);
   };
@@ -1022,6 +1359,13 @@ export default function App() {
   const playbook = generatePlaybook(selectedStyle);
   const textAnalysis = analyzeTweetText(tweetText);
 
+  // New: Real-time issue detection
+  const spellingErrors = findSpellingErrors(tweetText);
+  const grammarIssues = detectGrammarIssues(tweetText);
+  const allIssues = [...spellingErrors, ...grammarIssues];
+  const rewriteVariations = generateRewriteVariations(tweetText);
+  const smartSuggestions = generateSmartSuggestions(tweetText);
+
   const contentTypeOptions = ['video', 'image', 'poll', 'thread', 'gif', 'link'];
 
   return (
@@ -1155,7 +1499,242 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Rewrite Buttons */}
+              {/* Issues Detection Panel */}
+              {tweetText && allIssues.length > 0 && (
+                <div style={{
+                  marginTop: '15px',
+                  padding: '15px',
+                  background: COLORS.danger + '08',
+                  borderRadius: '12px',
+                  border: `1px solid ${COLORS.danger}20`,
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '12px',
+                  }}>
+                    <h4 style={{ margin: 0, color: COLORS.danger, fontSize: '14px' }}>
+                      {allIssues.length} Issue{allIssues.length > 1 ? 's' : ''} Detected
+                    </h4>
+                    <button
+                      onClick={fixGrammarAndSpelling}
+                      style={{
+                        ...STYLES.button,
+                        padding: '6px 12px',
+                        fontSize: '12px',
+                        background: COLORS.danger,
+                        color: COLORS.white,
+                        border: 'none',
+                      }}
+                    >
+                      Fix All
+                    </button>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {allIssues.slice(0, 5).map((issue, i) => (
+                      <div key={i} style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '8px 12px',
+                        background: COLORS.white,
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                      }}>
+                        <span style={{
+                          padding: '2px 6px',
+                          background: issue.type === 'spelling' ? '#FFE0B2' :
+                                     issue.type === 'grammar' ? '#FFCDD2' :
+                                     issue.type === 'missing_word' ? '#E1BEE7' : '#BBDEFB',
+                          borderRadius: '4px',
+                          fontSize: '10px',
+                          fontWeight: '600',
+                          textTransform: 'uppercase',
+                        }}>
+                          {issue.type.replace('_', ' ')}
+                        </span>
+                        <span style={{ color: COLORS.textLight }}>{issue.message}</span>
+                      </div>
+                    ))}
+                    {allIssues.length > 5 && (
+                      <div style={{ fontSize: '12px', color: COLORS.textLight, textAlign: 'center' }}>
+                        +{allIssues.length - 5} more issues
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Smart Suggestions Panel */}
+              {tweetText && smartSuggestions.length > 0 && (
+                <div style={{
+                  marginTop: '15px',
+                  padding: '15px',
+                  background: COLORS.primary + '08',
+                  borderRadius: '12px',
+                  border: `1px solid ${COLORS.primary}20`,
+                }}>
+                  <h4 style={{ margin: '0 0 12px 0', color: COLORS.primary, fontSize: '14px' }}>
+                    Engagement Tips
+                  </h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {smartSuggestions.map((suggestion, i) => (
+                      <div key={i} style={{
+                        padding: '10px 12px',
+                        background: COLORS.white,
+                        borderRadius: '8px',
+                        borderLeft: `3px solid ${
+                          suggestion.priority === 'high' ? COLORS.danger :
+                          suggestion.priority === 'medium' ? COLORS.warning : COLORS.textLight
+                        }`,
+                      }}>
+                        <div style={{ fontWeight: '600', fontSize: '13px', color: COLORS.text }}>
+                          {suggestion.message}
+                        </div>
+                        <div style={{ fontSize: '12px', color: COLORS.textLight, marginTop: '2px' }}>
+                          {suggestion.detail}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Rewrite Variations Panel */}
+              {tweetText && rewriteVariations && (
+                <div style={{
+                  marginTop: '15px',
+                  padding: '15px',
+                  background: COLORS.success + '08',
+                  borderRadius: '12px',
+                  border: `1px solid ${COLORS.success}20`,
+                }}>
+                  <h4 style={{ margin: '0 0 15px 0', color: COLORS.success, fontSize: '14px' }}>
+                    Rewrite Variations
+                  </h4>
+
+                  {/* Fixed Version */}
+                  {rewriteVariations.fixed !== tweetText && (
+                    <div style={{ marginBottom: '15px' }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '8px',
+                      }}>
+                        <span style={{ fontSize: '12px', fontWeight: '600', color: COLORS.text }}>
+                          Grammar Fixed
+                        </span>
+                        <button
+                          onClick={() => setTweetText(rewriteVariations.fixed)}
+                          style={{
+                            ...STYLES.button,
+                            padding: '4px 10px',
+                            fontSize: '11px',
+                            background: COLORS.white,
+                            color: COLORS.text,
+                            border: `1px solid ${COLORS.textLight}30`,
+                          }}
+                        >
+                          Use This
+                        </button>
+                      </div>
+                      <div style={{
+                        padding: '12px',
+                        background: COLORS.white,
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        lineHeight: '1.5',
+                        whiteSpace: 'pre-wrap',
+                        color: COLORS.text,
+                      }}>
+                        {rewriteVariations.fixed}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Engagement Version */}
+                  <div style={{ marginBottom: '15px' }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '8px',
+                    }}>
+                      <span style={{ fontSize: '12px', fontWeight: '600', color: COLORS.success }}>
+                        Engagement Optimized
+                      </span>
+                      <button
+                        onClick={() => setTweetText(rewriteVariations.engagement)}
+                        style={{
+                          ...STYLES.button,
+                          padding: '4px 10px',
+                          fontSize: '11px',
+                          background: COLORS.success,
+                          color: COLORS.white,
+                          border: 'none',
+                        }}
+                      >
+                        Use This
+                      </button>
+                    </div>
+                    <div style={{
+                      padding: '12px',
+                      background: COLORS.white,
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                      lineHeight: '1.5',
+                      whiteSpace: 'pre-wrap',
+                      color: COLORS.text,
+                      border: `1px solid ${COLORS.success}30`,
+                    }}>
+                      {rewriteVariations.engagement}
+                    </div>
+                  </div>
+
+                  {/* Punchy Viral Version */}
+                  <div>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '8px',
+                    }}>
+                      <span style={{ fontSize: '12px', fontWeight: '600', color: COLORS.danger }}>
+                        Punchy Viral (Risky)
+                      </span>
+                      <button
+                        onClick={() => setTweetText(rewriteVariations.punchy)}
+                        style={{
+                          ...STYLES.button,
+                          padding: '4px 10px',
+                          fontSize: '11px',
+                          background: COLORS.danger,
+                          color: COLORS.white,
+                          border: 'none',
+                        }}
+                      >
+                        Use This
+                      </button>
+                    </div>
+                    <div style={{
+                      padding: '12px',
+                      background: COLORS.white,
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                      lineHeight: '1.5',
+                      whiteSpace: 'pre-wrap',
+                      color: COLORS.text,
+                      border: `1px solid ${COLORS.danger}30`,
+                    }}>
+                      {rewriteVariations.punchy}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Quick Rewrite Buttons (legacy) */}
               {tweetText && (
                 <div style={{ marginTop: '15px' }}>
                   <label style={{
@@ -1164,7 +1743,7 @@ export default function App() {
                     fontWeight: '600',
                     color: COLORS.text,
                   }}>
-                    Rewrite
+                    Quick Actions
                   </label>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                     <button
@@ -1200,6 +1779,16 @@ export default function App() {
                       }}
                     >
                       Risky Viral
+                    </button>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(tweetText)}
+                      style={{
+                        ...STYLES.button,
+                        ...STYLES.inactiveButton,
+                        padding: '8px 16px',
+                      }}
+                    >
+                      Copy
                     </button>
                   </div>
                 </div>
