@@ -966,12 +966,30 @@ export default function App() {
               <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
+                alignItems: 'center',
                 marginTop: '8px',
                 color: COLORS.textLight,
                 fontSize: '14px',
               }}>
                 <span>{tweetText.length}/280</span>
-                <span>{textAnalysis.wordCount} words</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                  <span>{textAnalysis.wordCount} words</span>
+                  {tweetText && (
+                    <button
+                      onClick={() => setTweetText('')}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: COLORS.danger,
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        padding: '2px 8px',
+                      }}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Rewrite Buttons */}
@@ -1305,6 +1323,32 @@ export default function App() {
                 >
                   {fetchingPost ? 'Fetching...' : 'Fetch'}
                 </button>
+                <button
+                  onClick={() => {
+                    setPostUrl('');
+                    setTweetText('');
+                    setContentTypes([]);
+                    setMetrics({
+                      impressions: '',
+                      likes: '',
+                      retweets: '',
+                      replies: '',
+                      quotes: '',
+                      bookmarks: '',
+                      profileVisits: '',
+                      yourReplies: '',
+                    });
+                    setAnalysisResult(null);
+                    setPostFetchError('');
+                  }}
+                  style={{
+                    ...STYLES.button,
+                    ...STYLES.inactiveButton,
+                    color: COLORS.danger,
+                  }}
+                >
+                  Clear
+                </button>
               </div>
               {postFetchError && (
                 <div style={{ marginTop: '10px', color: COLORS.danger, fontSize: '14px' }}>
@@ -1512,6 +1556,23 @@ export default function App() {
                   }}
                 >
                   {fetchingTweet ? 'Fetching...' : 'Fetch'}
+                </button>
+                <button
+                  onClick={() => {
+                    setTweetUrl('');
+                    setOtherTweetText('');
+                    setOtherContentTypes([]);
+                    setOtherAnalysis(null);
+                    setFetchedMetrics(null);
+                    setFetchError('');
+                  }}
+                  style={{
+                    ...STYLES.button,
+                    ...STYLES.inactiveButton,
+                    color: COLORS.danger,
+                  }}
+                >
+                  Clear
                 </button>
               </div>
 
