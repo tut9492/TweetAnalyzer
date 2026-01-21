@@ -437,7 +437,9 @@ export default function App() {
     algorithmScore += likes * ALGORITHM_WEIGHTS.like;
     algorithmScore += bookmarks * ALGORITHM_WEIGHTS.bookmark;
 
-    const normalizedScore = Math.min(10, algorithmScore / impressions * 100).toFixed(1);
+    const normalizedScore = impressions > 0
+      ? Math.min(10, algorithmScore / impressions * 100).toFixed(1)
+      : '0.0';
 
     const whatWorked = [];
     const whatDidnt = [];
