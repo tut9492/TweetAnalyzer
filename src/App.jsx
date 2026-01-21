@@ -334,6 +334,14 @@ export default function App() {
   const [otherTweetText, setOtherTweetText] = useState('');
   const [otherContentTypes, setOtherContentTypes] = useState([]);
   const [otherAnalysis, setOtherAnalysis] = useState(null);
+  const [tweetUrl, setTweetUrl] = useState('');
+  const [fetchingTweet, setFetchingTweet] = useState(false);
+  const [fetchError, setFetchError] = useState('');
+  const [fetchedMetrics, setFetchedMetrics] = useState(null);
+
+  // API Settings
+  const [apiKey, setApiKey] = useState('');
+  const [showApiSettings, setShowApiSettings] = useState(false);
 
   // History filters
   const [historyFilter, setHistoryFilter] = useState('all');
@@ -353,7 +361,19 @@ export default function App() {
       const elapsed = Math.floor((Date.now() - timer.startTime) / 1000);
       setTimerSeconds(elapsed);
     }
+
+    const savedApiKey = localStorage.getItem('twitterApiKey');
+    if (savedApiKey) {
+      setApiKey(savedApiKey);
+    }
   }, []);
+
+  // Save API key to localStorage
+  useEffect(() => {
+    if (apiKey) {
+      localStorage.setItem('twitterApiKey', apiKey);
+    }
+  }, [apiKey]);
 
   // Save history to localStorage
   useEffect(() => {
@@ -472,6 +492,90 @@ export default function App() {
       timestamp: new Date().toISOString(),
     };
     setHistory(prev => [entry, ...prev]);
+  };
+
+  // Extract tweet ID from URL
+  const extractTweetId = (url) => {
+    const patterns = [
+      /twitter\.com\/\w+\/status\/(\d+)/,
+      /x\.com\/\w+\/status\/(\d+)/,
+    ];
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match) return match[1];
+    }
+    return null;
+  };
+
+  // Fetch tweet from twitterapi.io
+  const fetchTweet = async () => {
+    if (!apiKey) {
+      setFetchError('Please set your twitterapi.io API key in settings');
+      setShowApiSettings(true);
+      return;
+    }
+
+    const tweetId = extractTweetId(tweetUrl);
+    if (!tweetId) {
+      setFetchError('Invalid tweet URL. Use format: https://x.com/user/status/123456');
+      return;
+    }
+
+    setFetchingTweet(true);
+    setFetchError('');
+    setFetchedMetrics(null);
+
+    try {
+      const response = await fetch(
+        `https://api.twitterapi.io/twitter/tweets?tweet_ids=${tweetId}`,
+        {
+          headers: {
+            'X-API-Key': apiKey,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.tweets || data.tweets.length === 0) {
+        throw new Error('Tweet not found');
+      }
+
+      const tweet = data.tweets[0];
+
+      // Set tweet text
+      setOtherTweetText(tweet.text || '');
+
+      // Auto-detect content types from tweet
+      const detectedTypes = [];
+      if (tweet.media?.some(m => m.type === 'video')) detectedTypes.push('video');
+      if (tweet.media?.some(m => m.type === 'photo')) detectedTypes.push('image');
+      if (tweet.media?.some(m => m.type === 'animated_gif')) detectedTypes.push('gif');
+      if (tweet.text?.includes('https://') || tweet.text?.includes('http://')) detectedTypes.push('link');
+      if (tweet.isThread) detectedTypes.push('thread');
+      setOtherContentTypes(detectedTypes);
+
+      // Store fetched metrics for display
+      setFetchedMetrics({
+        likes: tweet.likeCount || 0,
+        retweets: tweet.retweetCount || 0,
+        replies: tweet.replyCount || 0,
+        quotes: tweet.quoteCount || 0,
+        bookmarks: tweet.bookmarkCount || 0,
+        views: tweet.viewCount || 0,
+        author: tweet.author?.userName || 'Unknown',
+        createdAt: tweet.createdAt,
+      });
+
+    } catch (error) {
+      setFetchError(error.message || 'Failed to fetch tweet');
+    } finally {
+      setFetchingTweet(false);
+    }
   };
 
   const analyzeOtherTweet = () => {
@@ -1111,11 +1215,105 @@ export default function App() {
         {/* Analyze Others Tab */}
         {activeTab === 'others' && (
           <div>
+            {/* URL Fetch Section */}
+            <div style={{ ...STYLES.card, marginBottom: '15px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <label style={{ fontWeight: '600', color: COLORS.text }}>
+                  Fetch from URL
+                </label>
+                <button
+                  onClick={() => setShowApiSettings(!showApiSettings)}
+                  style={{
+                    ...STYLES.button,
+                    ...STYLES.inactiveButton,
+                    padding: '6px 12px',
+                    fontSize: '12px',
+                  }}
+                >
+                  {apiKey ? 'API Key Set' : 'Set API Key'}
+                </button>
+              </div>
+
+              {showApiSettings && (
+                <div style={{ marginBottom: '12px' }}>
+                  <input
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="Enter your twitterapi.io API key"
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #E0E0E0',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      marginBottom: '8px',
+                    }}
+                  />
+                  <div style={{ fontSize: '12px', color: COLORS.textLight }}>
+                    Get your API key from twitterapi.io
+                  </div>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <input
+                  type="text"
+                  value={tweetUrl}
+                  onChange={(e) => setTweetUrl(e.target.value)}
+                  placeholder="https://x.com/user/status/123456789"
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    border: '1px solid #E0E0E0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                  }}
+                />
+                <button
+                  onClick={fetchTweet}
+                  disabled={fetchingTweet || !tweetUrl}
+                  style={{
+                    ...STYLES.button,
+                    ...STYLES.activeButton,
+                    opacity: fetchingTweet || !tweetUrl ? 0.6 : 1,
+                  }}
+                >
+                  {fetchingTweet ? 'Fetching...' : 'Fetch'}
+                </button>
+              </div>
+
+              {fetchError && (
+                <div style={{ marginTop: '10px', color: COLORS.danger, fontSize: '14px' }}>
+                  {fetchError}
+                </div>
+              )}
+
+              {fetchedMetrics && (
+                <div style={{ marginTop: '15px', padding: '12px', background: '#F5F5F5', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '12px', color: COLORS.textLight, marginBottom: '8px' }}>
+                    @{fetchedMetrics.author} - {new Date(fetchedMetrics.createdAt).toLocaleDateString()}
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', fontSize: '14px' }}>
+                    <span>{fetchedMetrics.views.toLocaleString()} views</span>
+                    <span>{fetchedMetrics.likes.toLocaleString()} likes</span>
+                    <span>{fetchedMetrics.retweets.toLocaleString()} RTs</span>
+                    <span>{fetchedMetrics.replies.toLocaleString()} replies</span>
+                    <span>{fetchedMetrics.quotes.toLocaleString()} quotes</span>
+                    <span>{fetchedMetrics.bookmarks.toLocaleString()} bookmarks</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div style={STYLES.card}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: COLORS.text }}>
+                Tweet Text
+              </label>
               <textarea
                 value={otherTweetText}
                 onChange={(e) => setOtherTweetText(e.target.value)}
-                placeholder="Paste a viral tweet to analyze..."
+                placeholder="Paste a viral tweet to analyze, or fetch from URL above..."
                 style={{
                   width: '100%',
                   minHeight: '120px',
