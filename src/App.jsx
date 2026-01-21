@@ -342,9 +342,6 @@ export default function App() {
   const [fetchError, setFetchError] = useState('');
   const [fetchedMetrics, setFetchedMetrics] = useState(null);
 
-  // API Settings
-  const [apiKey, setApiKey] = useState('');
-  const [showApiSettings, setShowApiSettings] = useState(false);
 
   // History filters
   const [historyFilter, setHistoryFilter] = useState('all');
@@ -364,19 +361,7 @@ export default function App() {
       const elapsed = Math.floor((Date.now() - timer.startTime) / 1000);
       setTimerSeconds(elapsed);
     }
-
-    const savedApiKey = localStorage.getItem('twitterApiKey');
-    if (savedApiKey) {
-      setApiKey(savedApiKey);
-    }
   }, []);
-
-  // Save API key to localStorage
-  useEffect(() => {
-    if (apiKey) {
-      localStorage.setItem('twitterApiKey', apiKey);
-    }
-  }, [apiKey]);
 
   // Save history to localStorage
   useEffect(() => {
@@ -510,14 +495,8 @@ export default function App() {
     return null;
   };
 
-  // Fetch tweet from twitterapi.io
+  // Fetch tweet from backend API (proxies to twitterapi.io)
   const fetchTweet = async () => {
-    if (!apiKey) {
-      setFetchError('Please set your twitterapi.io API key in settings');
-      setShowApiSettings(true);
-      return;
-    }
-
     const tweetId = extractTweetId(tweetUrl);
     if (!tweetId) {
       setFetchError('Invalid tweet URL. Use format: https://x.com/user/status/123456');
@@ -529,17 +508,11 @@ export default function App() {
     setFetchedMetrics(null);
 
     try {
-      const response = await fetch(
-        `https://api.twitterapi.io/twitter/tweets?tweet_ids=${tweetId}`,
-        {
-          headers: {
-            'X-API-Key': apiKey,
-          },
-        }
-      );
+      const response = await fetch(`/api/tweet?tweet_ids=${tweetId}`);
 
       if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `API error: ${response.status}`);
       }
 
       const data = await response.json();
@@ -583,11 +556,6 @@ export default function App() {
 
   // Fetch post metrics for Post Analyzer tab
   const fetchPostMetrics = async () => {
-    if (!apiKey) {
-      setPostFetchError('Please set your twitterapi.io API key in Analyze Others tab');
-      return;
-    }
-
     const tweetId = extractTweetId(postUrl);
     if (!tweetId) {
       setPostFetchError('Invalid tweet URL. Use format: https://x.com/user/status/123456');
@@ -598,17 +566,11 @@ export default function App() {
     setPostFetchError('');
 
     try {
-      const response = await fetch(
-        `https://api.twitterapi.io/twitter/tweets?tweet_ids=${tweetId}`,
-        {
-          headers: {
-            'X-API-Key': apiKey,
-          },
-        }
-      );
+      const response = await fetch(`/api/tweet?tweet_ids=${tweetId}`);
 
       if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `API error: ${response.status}`);
       }
 
       const data = await response.json();
@@ -1349,11 +1311,6 @@ export default function App() {
                   {postFetchError}
                 </div>
               )}
-              {!apiKey && (
-                <div style={{ marginTop: '10px', color: COLORS.textLight, fontSize: '12px' }}>
-                  Set your API key in the "Analyze Others" tab first
-                </div>
-              )}
             </div>
 
             <div style={STYLES.card}>
@@ -1528,45 +1485,9 @@ export default function App() {
           <div>
             {/* URL Fetch Section */}
             <div style={{ ...STYLES.card, marginBottom: '15px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <label style={{ fontWeight: '600', color: COLORS.text }}>
-                  Fetch from URL
-                </label>
-                <button
-                  onClick={() => setShowApiSettings(!showApiSettings)}
-                  style={{
-                    ...STYLES.button,
-                    ...STYLES.inactiveButton,
-                    padding: '6px 12px',
-                    fontSize: '12px',
-                  }}
-                >
-                  {apiKey ? 'API Key Set' : 'Set API Key'}
-                </button>
-              </div>
-
-              {showApiSettings && (
-                <div style={{ marginBottom: '12px' }}>
-                  <input
-                    type="password"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    placeholder="Enter your twitterapi.io API key"
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: '1px solid #E0E0E0',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      marginBottom: '8px',
-                    }}
-                  />
-                  <div style={{ fontSize: '12px', color: COLORS.textLight }}>
-                    Get your API key from twitterapi.io
-                  </div>
-                </div>
-              )}
-
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: COLORS.text }}>
+                Fetch from URL
+              </label>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <input
                   type="text"
