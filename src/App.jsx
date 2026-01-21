@@ -615,6 +615,149 @@ export default function App() {
     return structure.join('\n');
   };
 
+  // Grammar and spelling fixes
+  const fixGrammarAndSpelling = () => {
+    let text = tweetText;
+
+    // Common spelling fixes
+    const spellingFixes = {
+      'teh': 'the', 'thier': 'their', 'recieve': 'receive', 'occured': 'occurred',
+      'seperate': 'separate', 'definately': 'definitely', 'occassion': 'occasion',
+      'untill': 'until', 'wierd': 'weird', 'acheive': 'achieve', 'beleive': 'believe',
+      'concious': 'conscious', 'enviroment': 'environment', 'goverment': 'government',
+      'immedietly': 'immediately', 'neccessary': 'necessary', 'occurence': 'occurrence',
+      'posession': 'possession', 'recomend': 'recommend', 'succesful': 'successful',
+      'tommorow': 'tomorrow', 'truely': 'truly', 'accomodate': 'accommodate',
+      'apparantly': 'apparently', 'begining': 'beginning', 'calender': 'calendar',
+      'collegue': 'colleague', 'commited': 'committed', 'dont': "don't", 'doesnt': "doesn't",
+      'didnt': "didn't", 'cant': "can't", 'wont': "won't", 'im': "I'm", 'ive': "I've",
+      'youre': "you're", 'theyre': "they're", 'its a': "it's a", 'alot': 'a lot',
+    };
+
+    // Apply spelling fixes (case-insensitive)
+    Object.entries(spellingFixes).forEach(([wrong, right]) => {
+      const regex = new RegExp(`\\b${wrong}\\b`, 'gi');
+      text = text.replace(regex, (match) => {
+        // Preserve original case for first letter
+        if (match[0] === match[0].toUpperCase()) {
+          return right.charAt(0).toUpperCase() + right.slice(1);
+        }
+        return right;
+      });
+    });
+
+    // Capitalize first letter of sentences
+    text = text.replace(/(^|[.!?]\s+)([a-z])/g, (match, p1, p2) => p1 + p2.toUpperCase());
+
+    // Capitalize 'I' when standalone
+    text = text.replace(/\bi\b/g, 'I');
+
+    // Fix double spaces
+    text = text.replace(/  +/g, ' ');
+
+    // Fix space before punctuation
+    text = text.replace(/\s+([.,!?])/g, '$1');
+
+    setTweetText(text);
+  };
+
+  // Rewrite for maximum engagement (based on X algorithm)
+  const rewriteForEngagement = () => {
+    let text = tweetText;
+
+    // Remove excess hashtags (keep max 1)
+    const hashtags = text.match(/#\w+/g) || [];
+    if (hashtags.length > 1) {
+      hashtags.slice(1).forEach(tag => {
+        text = text.replace(tag, '').trim();
+      });
+    }
+
+    // Remove external links (30-50% penalty)
+    text = text.replace(/https?:\/\/\S+/g, '[link in bio]');
+
+    // Add line breaks for readability (choppy format performs better)
+    if (!text.includes('\n') && text.length > 100) {
+      const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+      if (sentences.length > 1) {
+        text = sentences.map(s => s.trim()).join('\n\n');
+      }
+    }
+
+    // If no question, add engagement hook at end
+    if (!text.includes('?')) {
+      const hooks = [
+        '\n\nThoughts?',
+        '\n\nAgree or disagree?',
+        '\n\nWhat would you add?',
+        '\n\nDoes this resonate?',
+      ];
+      const hook = hooks[Math.floor(Math.random() * hooks.length)];
+      if (text.length + hook.length <= 280) {
+        text = text.trim() + hook;
+      }
+    }
+
+    // Clean up extra whitespace
+    text = text.replace(/\n{3,}/g, '\n\n').trim();
+
+    setTweetText(text);
+  };
+
+  // Super risky rewrite for virality
+  const rewriteForVirality = () => {
+    let text = tweetText;
+
+    // Remove all hashtags (they don't help virality)
+    text = text.replace(/#\w+/g, '').trim();
+
+    // Remove links
+    text = text.replace(/https?:\/\/\S+/g, '').trim();
+
+    // Add provocative hook at start if not present
+    const hasStrongOpen = /^(Hot take|Unpopular opinion|Controversial|Truth bomb|Hard truth|Nobody talks about|The real reason|Stop |Here's what|Most people|I'm convinced)/i.test(text);
+
+    if (!hasStrongOpen && text.length < 240) {
+      const hooks = [
+        'Hot take: ',
+        'Unpopular opinion: ',
+        'Hard truth: ',
+        'Nobody talks about this but ',
+        'The real reason ',
+        'Most people get this wrong: ',
+      ];
+      const hook = hooks[Math.floor(Math.random() * hooks.length)];
+      text = hook + text.charAt(0).toLowerCase() + text.slice(1);
+    }
+
+    // Make it more direct/choppy
+    if (!text.includes('\n')) {
+      text = text.replace(/\. /g, '.\n\n');
+    }
+
+    // Add controversial closer if room
+    if (!text.includes('?') && text.length < 250) {
+      const closers = [
+        '\n\nChange my mind.',
+        '\n\nProve me wrong.',
+        '\n\nFight me.',
+        '\n\nIf you disagree, you\'re not paying attention.',
+      ];
+      const closer = closers[Math.floor(Math.random() * closers.length)];
+      text = text.trim() + closer;
+    }
+
+    // Clean up
+    text = text.replace(/\n{3,}/g, '\n\n').trim();
+
+    // Truncate if over limit
+    if (text.length > 280) {
+      text = text.substring(0, 277) + '...';
+    }
+
+    setTweetText(text);
+  };
+
   const deleteHistoryItem = (id) => {
     setHistory(prev => prev.filter(item => item.id !== id));
   };
@@ -796,6 +939,56 @@ export default function App() {
                 <span>{tweetText.length}/280</span>
                 <span>{textAnalysis.wordCount} words</span>
               </div>
+
+              {/* Rewrite Buttons */}
+              {tweetText && (
+                <div style={{ marginTop: '15px' }}>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: '8px',
+                    fontWeight: '600',
+                    color: COLORS.text,
+                  }}>
+                    Rewrite
+                  </label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    <button
+                      onClick={fixGrammarAndSpelling}
+                      style={{
+                        ...STYLES.button,
+                        ...STYLES.inactiveButton,
+                        padding: '8px 16px',
+                      }}
+                    >
+                      Fix Grammar
+                    </button>
+                    <button
+                      onClick={rewriteForEngagement}
+                      style={{
+                        ...STYLES.button,
+                        ...STYLES.inactiveButton,
+                        padding: '8px 16px',
+                        borderColor: COLORS.success,
+                        color: COLORS.success,
+                      }}
+                    >
+                      Max Engagement
+                    </button>
+                    <button
+                      onClick={rewriteForVirality}
+                      style={{
+                        ...STYLES.button,
+                        ...STYLES.inactiveButton,
+                        padding: '8px 16px',
+                        borderColor: COLORS.danger,
+                        color: COLORS.danger,
+                      }}
+                    >
+                      Risky Viral
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Style Selector */}
               <div style={{ marginTop: '20px' }}>
