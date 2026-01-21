@@ -430,42 +430,205 @@ export default function App() {
     const bookmarks = parseInt(metrics.bookmarks) || 0;
     const yourReplies = parseInt(metrics.yourReplies) || 0;
 
+    // === ENGAGEMENT RATES ===
     const engagementRate = impressions > 0
-      ? ((likes + retweets + replies + quotes + bookmarks) / impressions * 100).toFixed(2)
+      ? ((likes + retweets + replies + quotes + bookmarks) / impressions * 100)
       : 0;
 
-    // Calculate algorithm score
-    let algorithmScore = 0;
-    algorithmScore += replies * ALGORITHM_WEIGHTS.reply;
-    if (yourReplies > 0) {
-      algorithmScore += Math.min(replies, yourReplies) * ALGORITHM_WEIGHTS.replyWithEngagement;
-    }
-    algorithmScore += retweets * ALGORITHM_WEIGHTS.retweet;
-    algorithmScore += quotes * ALGORITHM_WEIGHTS.quote;
-    algorithmScore += likes * ALGORITHM_WEIGHTS.like;
-    algorithmScore += bookmarks * ALGORITHM_WEIGHTS.bookmark;
+    const replyRate = impressions > 0 ? (replies / impressions * 100) : 0;
+    const retweetRate = impressions > 0 ? (retweets / impressions * 100) : 0;
+    const bookmarkRate = impressions > 0 ? (bookmarks / impressions * 100) : 0;
+    const quoteRate = impressions > 0 ? (quotes / impressions * 100) : 0;
+    const likeRate = impressions > 0 ? (likes / impressions * 100) : 0;
 
+    // === BENCHMARKS (industry averages) ===
+    const benchmarks = {
+      replyRate: { poor: 0.5, good: 1.0, great: 2.0 },
+      retweetRate: { poor: 0.25, good: 0.5, great: 1.0 },
+      bookmarkRate: { poor: 0.1, good: 0.2, great: 0.5 },
+      quoteRate: { poor: 0.1, good: 0.2, great: 0.4 },
+      likeRate: { poor: 1.0, good: 2.0, great: 4.0 },
+      engagementRate: { poor: 2.0, good: 4.0, great: 6.0 },
+    };
+
+    const getRating = (value, benchmark) => {
+      if (value >= benchmark.great) return { label: 'Excellent', color: COLORS.success };
+      if (value >= benchmark.good) return { label: 'Good', color: COLORS.primary };
+      if (value >= benchmark.poor) return { label: 'Average', color: COLORS.warning };
+      return { label: 'Below Avg', color: COLORS.danger };
+    };
+
+    const rateBreakdown = {
+      replies: { rate: replyRate, rating: getRating(replyRate, benchmarks.replyRate) },
+      retweets: { rate: retweetRate, rating: getRating(retweetRate, benchmarks.retweetRate) },
+      bookmarks: { rate: bookmarkRate, rating: getRating(bookmarkRate, benchmarks.bookmarkRate) },
+      quotes: { rate: quoteRate, rating: getRating(quoteRate, benchmarks.quoteRate) },
+      likes: { rate: likeRate, rating: getRating(likeRate, benchmarks.likeRate) },
+      overall: { rate: engagementRate, rating: getRating(engagementRate, benchmarks.engagementRate) },
+    };
+
+    // === ALGORITHM SCORE BREAKDOWN ===
+    const scoreBreakdown = {
+      replyEngaged: yourReplies > 0 ? Math.min(replies, yourReplies) * ALGORITHM_WEIGHTS.replyWithEngagement : 0,
+      replies: replies * ALGORITHM_WEIGHTS.reply,
+      retweets: retweets * ALGORITHM_WEIGHTS.retweet,
+      quotes: quotes * ALGORITHM_WEIGHTS.quote,
+      likes: likes * ALGORITHM_WEIGHTS.like,
+      bookmarks: bookmarks * ALGORITHM_WEIGHTS.bookmark,
+    };
+
+    const totalAlgoScore = Object.values(scoreBreakdown).reduce((a, b) => a + b, 0);
     const normalizedScore = impressions > 0
-      ? Math.min(10, algorithmScore / impressions * 100).toFixed(1)
+      ? Math.min(10, totalAlgoScore / impressions * 100).toFixed(1)
       : '0.0';
 
+    // Calculate percentage contribution of each signal
+    const scoreContributions = {};
+    Object.entries(scoreBreakdown).forEach(([key, value]) => {
+      scoreContributions[key] = totalAlgoScore > 0 ? ((value / totalAlgoScore) * 100).toFixed(1) : 0;
+    });
+
+    // === VIRALITY METRICS ===
+    const viralityScore = impressions > 0
+      ? ((retweets + quotes) / impressions * 1000).toFixed(2)
+      : 0;
+    const shareability = retweets + quotes;
+    const conversationRatio = replies > 0 ? (yourReplies / replies * 100).toFixed(0) : 0;
+
+    // === CONTENT ANALYSIS ===
+    const contentInsights = [];
+    const textAnalysis = analyzeTweetText(tweetText);
+
+    if (textAnalysis.charCount > 200) contentInsights.push({ text: 'Long-form content boosts dwell time', positive: true });
+    if (textAnalysis.charCount < 100) contentInsights.push({ text: 'Short tweet - may lack substance for saves', positive: false });
+    if (tweetText.includes('?')) contentInsights.push({ text: 'Question detected - good for replies', positive: true });
+    if (!tweetText.includes('?') && replyRate < 1) contentInsights.push({ text: 'No question - try asking to boost replies', positive: false });
+    if (textAnalysis.hashtagCount > 1) contentInsights.push({ text: 'Multiple hashtags hurt reach (-40% penalty)', positive: false });
+    if (textAnalysis.hashtagCount === 0) contentInsights.push({ text: 'No hashtags - good for algorithm', positive: true });
+    if (tweetText.includes('http')) contentInsights.push({ text: 'External link detected (-30-50% penalty)', positive: false });
+    if (textAnalysis.lineBreaks > 2) contentInsights.push({ text: 'Good formatting with line breaks', positive: true });
+    if (textAnalysis.isChoppy) contentInsights.push({ text: 'Choppy format - easy to read', positive: true });
+    if (textAnalysis.hasAllCaps) contentInsights.push({ text: 'ALL CAPS detected - triggers deboost', positive: false });
+
+    // === WHAT WORKED / DIDN'T ===
     const whatWorked = [];
     const whatDidnt = [];
 
-    if (replies > impressions * 0.01) whatWorked.push('Strong reply engagement');
-    else whatDidnt.push('Low reply rate - try asking questions');
+    if (rateBreakdown.replies.rating.label === 'Excellent' || rateBreakdown.replies.rating.label === 'Good') {
+      whatWorked.push(`Strong reply rate (${replyRate.toFixed(2)}%) - content sparks conversation`);
+    } else {
+      whatDidnt.push(`Low reply rate (${replyRate.toFixed(2)}%) - add questions or hot takes`);
+    }
 
-    if (retweets > impressions * 0.005) whatWorked.push('Good retweet potential');
-    else whatDidnt.push('Low retweet rate - make content more shareable');
+    if (rateBreakdown.retweets.rating.label === 'Excellent' || rateBreakdown.retweets.rating.label === 'Good') {
+      whatWorked.push(`Good RT rate (${retweetRate.toFixed(2)}%) - shareable content`);
+    } else {
+      whatDidnt.push(`Low RT rate (${retweetRate.toFixed(2)}%) - make it more quotable/shareable`);
+    }
 
-    if (bookmarks > impressions * 0.002) whatWorked.push('High save rate - valuable content');
-    else whatDidnt.push('Low bookmark rate - add more actionable value');
+    if (rateBreakdown.bookmarks.rating.label === 'Excellent' || rateBreakdown.bookmarks.rating.label === 'Good') {
+      whatWorked.push(`High save rate (${bookmarkRate.toFixed(2)}%) - valuable/actionable`);
+    } else {
+      whatDidnt.push(`Low save rate (${bookmarkRate.toFixed(2)}%) - add actionable insights`);
+    }
+
+    if (yourReplies > 0 && conversationRatio >= 50) {
+      whatWorked.push(`Great author engagement (${conversationRatio}% reply rate) - 75x algo boost`);
+    } else if (replies > 5 && yourReplies === 0) {
+      whatDidnt.push('No author replies - missing 75x engagement multiplier!');
+    }
+
+    if (quotes > retweets * 0.3) {
+      whatWorked.push('High quote ratio - content drives discussion');
+    }
+
+    // === RECOMMENDATIONS ===
+    const recommendations = [];
+
+    if (replyRate < 1 && !tweetText.includes('?')) {
+      recommendations.push({
+        priority: 'high',
+        text: 'Add a question to future tweets to boost reply rate',
+        impact: '+75x algorithm weight per reply you respond to'
+      });
+    }
+
+    if (yourReplies === 0 && replies > 0) {
+      recommendations.push({
+        priority: 'critical',
+        text: 'Reply to comments on this tweet NOW',
+        impact: 'Each reply you make = 75x algorithm boost (vs 13.5x for their reply)'
+      });
+    }
+
+    if (bookmarkRate < 0.2) {
+      recommendations.push({
+        priority: 'medium',
+        text: 'Add more actionable value (tips, frameworks, resources)',
+        impact: 'Bookmarks signal high-value content to the algorithm'
+      });
+    }
+
+    if (retweetRate < 0.5) {
+      recommendations.push({
+        priority: 'medium',
+        text: 'Make content more identity-reinforcing for shares',
+        impact: 'People RT what makes them look smart/informed'
+      });
+    }
+
+    if (textAnalysis.hashtagCount > 1) {
+      recommendations.push({
+        priority: 'high',
+        text: 'Use max 1 hashtag in future tweets',
+        impact: 'Multiple hashtags trigger -40% reach penalty'
+      });
+    }
+
+    // === HISTORICAL COMPARISON ===
+    let historicalComparison = null;
+    if (history.length >= 3) {
+      const pastEngagements = history
+        .filter(h => h.analysis?.engagementRate)
+        .map(h => parseFloat(h.analysis.engagementRate));
+
+      if (pastEngagements.length > 0) {
+        const avgEngagement = pastEngagements.reduce((a, b) => a + b, 0) / pastEngagements.length;
+        const percentDiff = ((engagementRate - avgEngagement) / avgEngagement * 100).toFixed(0);
+        historicalComparison = {
+          avgEngagement: avgEngagement.toFixed(2),
+          currentEngagement: engagementRate.toFixed(2),
+          percentDiff,
+          better: engagementRate > avgEngagement
+        };
+      }
+    }
+
+    // === OVERALL GRADE ===
+    let grade = 'C';
+    let gradeColor = COLORS.warning;
+    if (engagementRate >= 6 && replyRate >= 2) { grade = 'A+'; gradeColor = COLORS.success; }
+    else if (engagementRate >= 4 && replyRate >= 1) { grade = 'A'; gradeColor = COLORS.success; }
+    else if (engagementRate >= 3) { grade = 'B+'; gradeColor = COLORS.primary; }
+    else if (engagementRate >= 2) { grade = 'B'; gradeColor = COLORS.primary; }
+    else if (engagementRate >= 1) { grade = 'C'; gradeColor = COLORS.warning; }
+    else { grade = 'D'; gradeColor = COLORS.danger; }
 
     setAnalysisResult({
-      engagementRate,
+      engagementRate: engagementRate.toFixed(2),
       algorithmScore: normalizedScore,
+      grade,
+      gradeColor,
+      rateBreakdown,
+      scoreBreakdown,
+      scoreContributions,
+      viralityScore,
+      conversationRatio,
+      contentInsights,
       whatWorked,
       whatDidnt,
+      recommendations,
+      historicalComparison,
     });
   };
 
@@ -1474,39 +1637,211 @@ export default function App() {
             {/* Analysis Results */}
             {analysisResult && (
               <div style={{ marginTop: '20px' }}>
-                <div style={{ ...STYLES.card, display: 'flex', gap: '20px' }}>
-                  <div style={{ flex: 1, textAlign: 'center' }}>
-                    <div style={{ color: COLORS.textLight, fontSize: '14px' }}>Engagement Rate</div>
-                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: COLORS.primary }}>
+                {/* Top Stats Row */}
+                <div style={{ ...STYLES.card, display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <div style={{ textAlign: 'center', minWidth: '100px' }}>
+                    <div style={{ fontSize: '48px', fontWeight: 'bold', color: analysisResult.gradeColor }}>
+                      {analysisResult.grade}
+                    </div>
+                    <div style={{ color: COLORS.textLight, fontSize: '12px' }}>Overall Grade</div>
+                  </div>
+                  <div style={{ textAlign: 'center', minWidth: '100px' }}>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: analysisResult.rateBreakdown.overall.rating.color }}>
                       {analysisResult.engagementRate}%
                     </div>
+                    <div style={{ color: COLORS.textLight, fontSize: '12px' }}>Engagement Rate</div>
+                    <div style={{ fontSize: '11px', color: analysisResult.rateBreakdown.overall.rating.color }}>
+                      {analysisResult.rateBreakdown.overall.rating.label}
+                    </div>
                   </div>
-                  <div style={{ flex: 1, textAlign: 'center' }}>
-                    <div style={{ color: COLORS.textLight, fontSize: '14px' }}>Algorithm Score</div>
-                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: COLORS.success }}>
+                  <div style={{ textAlign: 'center', minWidth: '100px' }}>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: COLORS.primary }}>
                       {analysisResult.algorithmScore}
                     </div>
+                    <div style={{ color: COLORS.textLight, fontSize: '12px' }}>Algorithm Score</div>
+                  </div>
+                  <div style={{ textAlign: 'center', minWidth: '100px' }}>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: COLORS.text }}>
+                      {analysisResult.viralityScore}
+                    </div>
+                    <div style={{ color: COLORS.textLight, fontSize: '12px' }}>Virality Index</div>
                   </div>
                 </div>
 
+                {/* Historical Comparison */}
+                {analysisResult.historicalComparison && (
+                  <div style={{
+                    ...STYLES.card,
+                    marginTop: '15px',
+                    background: analysisResult.historicalComparison.better ? COLORS.success + '10' : COLORS.danger + '10',
+                    border: `1px solid ${analysisResult.historicalComparison.better ? COLORS.success : COLORS.danger}20`,
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: COLORS.textLight }}>vs Your Average ({analysisResult.historicalComparison.avgEngagement}%)</span>
+                      <span style={{
+                        fontWeight: 'bold',
+                        color: analysisResult.historicalComparison.better ? COLORS.success : COLORS.danger,
+                      }}>
+                        {analysisResult.historicalComparison.better ? '+' : ''}{analysisResult.historicalComparison.percentDiff}%
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Rate Breakdown */}
+                <div style={{ ...STYLES.card, marginTop: '15px' }}>
+                  <h3 style={{ marginBottom: '15px', color: COLORS.text }}>Engagement Breakdown vs Benchmarks</h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
+                    {Object.entries(analysisResult.rateBreakdown).filter(([k]) => k !== 'overall').map(([key, data]) => (
+                      <div key={key} style={{
+                        padding: '12px',
+                        background: '#F9F9F9',
+                        borderRadius: '8px',
+                        borderLeft: `3px solid ${data.rating.color}`,
+                      }}>
+                        <div style={{ fontSize: '12px', color: COLORS.textLight, textTransform: 'capitalize' }}>{key}</div>
+                        <div style={{ fontSize: '20px', fontWeight: 'bold', color: COLORS.text }}>{data.rate.toFixed(2)}%</div>
+                        <div style={{ fontSize: '11px', color: data.rating.color, fontWeight: '600' }}>{data.rating.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Algorithm Score Breakdown */}
+                <div style={{ ...STYLES.card, marginTop: '15px' }}>
+                  <h3 style={{ marginBottom: '15px', color: COLORS.text }}>Algorithm Score Breakdown</h3>
+                  <div style={{ fontSize: '12px', color: COLORS.textLight, marginBottom: '10px' }}>
+                    What contributed to your algorithm score (based on X's actual weights)
+                  </div>
+                  {Object.entries(analysisResult.scoreBreakdown)
+                    .filter(([_, value]) => value > 0)
+                    .sort(([, a], [, b]) => b - a)
+                    .map(([key, value]) => (
+                      <div key={key} style={{ marginBottom: '8px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                          <span style={{ fontSize: '13px', color: COLORS.text, textTransform: 'capitalize' }}>
+                            {key === 'replyEngaged' ? 'Your Replies (75x)' :
+                             key === 'replies' ? 'Replies (13.5x)' :
+                             key === 'retweets' ? 'Retweets (1x)' :
+                             key === 'quotes' ? 'Quotes (1x)' :
+                             key === 'likes' ? 'Likes (0.5x)' :
+                             key === 'bookmarks' ? 'Bookmarks (2x)' : key}
+                          </span>
+                          <span style={{ fontSize: '13px', fontWeight: '600' }}>
+                            {analysisResult.scoreContributions[key]}%
+                          </span>
+                        </div>
+                        <div style={{ height: '6px', background: '#E0E0E0', borderRadius: '3px', overflow: 'hidden' }}>
+                          <div style={{
+                            height: '100%',
+                            width: `${analysisResult.scoreContributions[key]}%`,
+                            background: key === 'replyEngaged' ? COLORS.success : COLORS.primary,
+                            borderRadius: '3px',
+                          }} />
+                        </div>
+                      </div>
+                    ))}
+                </div>
+
+                {/* Content Insights */}
+                {analysisResult.contentInsights.length > 0 && (
+                  <div style={{ ...STYLES.card, marginTop: '15px' }}>
+                    <h3 style={{ marginBottom: '15px', color: COLORS.text }}>Content Analysis</h3>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {analysisResult.contentInsights.map((insight, i) => (
+                        <span key={i} style={{
+                          padding: '6px 12px',
+                          borderRadius: '20px',
+                          fontSize: '12px',
+                          background: insight.positive ? COLORS.success + '15' : COLORS.danger + '15',
+                          color: insight.positive ? COLORS.success : COLORS.danger,
+                          border: `1px solid ${insight.positive ? COLORS.success : COLORS.danger}30`,
+                        }}>
+                          {insight.positive ? '+' : '-'} {insight.text}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* What Worked / Didn't */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '15px' }}>
                   <div style={STYLES.card}>
                     <h3 style={{ color: COLORS.success, marginBottom: '10px' }}>What Worked</h3>
-                    <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                      {analysisResult.whatWorked.map((item, i) => (
-                        <li key={i} style={{ color: COLORS.textLight, marginBottom: '6px' }}>{item}</li>
-                      ))}
-                    </ul>
+                    {analysisResult.whatWorked.length > 0 ? (
+                      <ul style={{ margin: 0, paddingLeft: '20px' }}>
+                        {analysisResult.whatWorked.map((item, i) => (
+                          <li key={i} style={{ color: COLORS.textLight, marginBottom: '6px', fontSize: '13px' }}>{item}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p style={{ color: COLORS.textLight, fontSize: '13px' }}>Keep experimenting to find what works</p>
+                    )}
                   </div>
                   <div style={STYLES.card}>
                     <h3 style={{ color: COLORS.danger, marginBottom: '10px' }}>What Didn't</h3>
                     <ul style={{ margin: 0, paddingLeft: '20px' }}>
                       {analysisResult.whatDidnt.map((item, i) => (
-                        <li key={i} style={{ color: COLORS.textLight, marginBottom: '6px' }}>{item}</li>
+                        <li key={i} style={{ color: COLORS.textLight, marginBottom: '6px', fontSize: '13px' }}>{item}</li>
                       ))}
                     </ul>
                   </div>
                 </div>
+
+                {/* Recommendations */}
+                {analysisResult.recommendations.length > 0 && (
+                  <div style={{ ...STYLES.card, marginTop: '15px' }}>
+                    <h3 style={{ marginBottom: '15px', color: COLORS.text }}>Action Items</h3>
+                    {analysisResult.recommendations.map((rec, i) => (
+                      <div key={i} style={{
+                        padding: '12px',
+                        marginBottom: '10px',
+                        borderRadius: '8px',
+                        background: rec.priority === 'critical' ? COLORS.danger + '10' :
+                                   rec.priority === 'high' ? COLORS.warning + '10' : '#F5F5F5',
+                        borderLeft: `3px solid ${
+                          rec.priority === 'critical' ? COLORS.danger :
+                          rec.priority === 'high' ? COLORS.warning : COLORS.textLight
+                        }`,
+                      }}>
+                        <div style={{
+                          fontSize: '10px',
+                          fontWeight: 'bold',
+                          textTransform: 'uppercase',
+                          color: rec.priority === 'critical' ? COLORS.danger :
+                                 rec.priority === 'high' ? COLORS.warning : COLORS.textLight,
+                          marginBottom: '4px',
+                        }}>
+                          {rec.priority} priority
+                        </div>
+                        <div style={{ fontWeight: '600', color: COLORS.text, marginBottom: '4px' }}>{rec.text}</div>
+                        <div style={{ fontSize: '12px', color: COLORS.textLight }}>{rec.impact}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Author Engagement Reminder */}
+                {parseInt(metrics.replies) > 0 && parseInt(metrics.yourReplies) === 0 && (
+                  <div style={{
+                    ...STYLES.card,
+                    marginTop: '15px',
+                    background: COLORS.danger + '10',
+                    border: `2px solid ${COLORS.danger}`,
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{ fontSize: '24px' }}>!</span>
+                      <div>
+                        <div style={{ fontWeight: 'bold', color: COLORS.danger }}>
+                          You have {metrics.replies} replies but haven't responded!
+                        </div>
+                        <div style={{ fontSize: '13px', color: COLORS.textLight }}>
+                          Each reply you make gives a 75x algorithm boost. Go engage now!
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <button
                   onClick={saveToHistory}
