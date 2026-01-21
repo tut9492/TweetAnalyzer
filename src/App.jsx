@@ -329,6 +329,9 @@ export default function App() {
     yourReplies: '',
   });
   const [analysisResult, setAnalysisResult] = useState(null);
+  const [postUrl, setPostUrl] = useState('');
+  const [fetchingPost, setFetchingPost] = useState(false);
+  const [postFetchError, setPostFetchError] = useState('');
 
   // Analyze Others state
   const [otherTweetText, setOtherTweetText] = useState('');
@@ -575,6 +578,75 @@ export default function App() {
       setFetchError(error.message || 'Failed to fetch tweet');
     } finally {
       setFetchingTweet(false);
+    }
+  };
+
+  // Fetch post metrics for Post Analyzer tab
+  const fetchPostMetrics = async () => {
+    if (!apiKey) {
+      setPostFetchError('Please set your twitterapi.io API key in Analyze Others tab');
+      return;
+    }
+
+    const tweetId = extractTweetId(postUrl);
+    if (!tweetId) {
+      setPostFetchError('Invalid tweet URL. Use format: https://x.com/user/status/123456');
+      return;
+    }
+
+    setFetchingPost(true);
+    setPostFetchError('');
+
+    try {
+      const response = await fetch(
+        `https://api.twitterapi.io/twitter/tweets?tweet_ids=${tweetId}`,
+        {
+          headers: {
+            'X-API-Key': apiKey,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.tweets || data.tweets.length === 0) {
+        throw new Error('Tweet not found');
+      }
+
+      const tweet = data.tweets[0];
+
+      // Set tweet text
+      setTweetText(tweet.text || '');
+
+      // Auto-detect content types
+      const detectedTypes = [];
+      if (tweet.media?.some(m => m.type === 'video')) detectedTypes.push('video');
+      if (tweet.media?.some(m => m.type === 'photo')) detectedTypes.push('image');
+      if (tweet.media?.some(m => m.type === 'animated_gif')) detectedTypes.push('gif');
+      if (tweet.text?.includes('https://') || tweet.text?.includes('http://')) detectedTypes.push('link');
+      if (tweet.isThread) detectedTypes.push('thread');
+      setContentTypes(detectedTypes);
+
+      // Auto-populate metrics
+      setMetrics({
+        impressions: String(tweet.viewCount || 0),
+        likes: String(tweet.likeCount || 0),
+        retweets: String(tweet.retweetCount || 0),
+        replies: String(tweet.replyCount || 0),
+        quotes: String(tweet.quoteCount || 0),
+        bookmarks: String(tweet.bookmarkCount || 0),
+        profileVisits: '',
+        yourReplies: '',
+      });
+
+    } catch (error) {
+      setPostFetchError(error.message || 'Failed to fetch tweet');
+    } finally {
+      setFetchingPost(false);
     }
   };
 
@@ -1241,11 +1313,57 @@ export default function App() {
         {/* Post Analyzer Tab */}
         {activeTab === 'post' && (
           <div>
+            {/* URL Fetch Section */}
+            <div style={{ ...STYLES.card, marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: COLORS.text }}>
+                Fetch Your Tweet
+              </label>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <input
+                  type="text"
+                  value={postUrl}
+                  onChange={(e) => setPostUrl(e.target.value)}
+                  placeholder="https://x.com/you/status/123456789"
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    border: '1px solid #E0E0E0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                  }}
+                />
+                <button
+                  onClick={fetchPostMetrics}
+                  disabled={fetchingPost || !postUrl}
+                  style={{
+                    ...STYLES.button,
+                    ...STYLES.activeButton,
+                    opacity: fetchingPost || !postUrl ? 0.6 : 1,
+                  }}
+                >
+                  {fetchingPost ? 'Fetching...' : 'Fetch'}
+                </button>
+              </div>
+              {postFetchError && (
+                <div style={{ marginTop: '10px', color: COLORS.danger, fontSize: '14px' }}>
+                  {postFetchError}
+                </div>
+              )}
+              {!apiKey && (
+                <div style={{ marginTop: '10px', color: COLORS.textLight, fontSize: '12px' }}>
+                  Set your API key in the "Analyze Others" tab first
+                </div>
+              )}
+            </div>
+
             <div style={STYLES.card}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: COLORS.text }}>
+                Tweet Text
+              </label>
               <textarea
                 value={tweetText}
                 onChange={(e) => setTweetText(e.target.value)}
-                placeholder="Paste your posted tweet here..."
+                placeholder="Paste your posted tweet here, or fetch from URL above..."
                 style={{
                   width: '100%',
                   minHeight: '100px',
