@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "idearalph": {
+      "command": "node",
+      "args": ["/root/.idearalph/mcp-server/dist/index.js"]
+    }
+  }
+}
