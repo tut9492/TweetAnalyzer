@@ -25,6 +25,173 @@ const CONTENT_MULTIPLIERS = {
   link: 0.7,
 };
 
+// Shane's Content Performance Benchmarks
+const SHANE_BENCHMARKS = {
+  // Impression benchmarks
+  impressions: {
+    average: 3011,
+    viral: 8456,
+    median: 1843,
+  },
+  // Content category performance (average impressions)
+  categories: {
+    personal: { avg: 7388, label: 'Personal Life', description: 'Family, kids, vulnerability', keywords: ['family', 'kids', 'wife', 'husband', 'son', 'daughter', 'dad', 'mom', 'learned', 'struggle', 'honest', 'confession', 'vulnerable', 'scared', 'proud', 'grateful', 'realized'] },
+    announcements: { avg: 5959, label: 'Announcements', description: 'Launches, news, updates', keywords: ['launching', 'announcing', 'excited to', 'just released', 'introducing', 'big news', 'shipped', 'live now'] },
+    alpha: { avg: 4824, label: 'Alpha/Tips', description: 'Insider info, actionable tips', keywords: ['alpha', 'tip:', 'secret', 'most people', 'here\'s how', 'stop doing', 'start doing', 'hack:', 'trick:', 'thread:', 'guide:'] },
+    longform: { avg: 3890, label: 'Long-form (200+ chars)', description: 'Detailed posts with depth', minChars: 200 },
+    general: { avg: 1515, label: 'General', description: 'Unthemed posts - avoid these', keywords: [] },
+  },
+  // Day of week performance (average impressions)
+  timing: {
+    sunday: { avg: 4988, rank: 1 },
+    monday: { avg: 3343, rank: 2 },
+    tuesday: { avg: 2912, rank: 3 },
+    wednesday: { avg: 2845, rank: 4 },
+    thursday: { avg: 2901, rank: 5 },
+    friday: { avg: 2781, rank: 7 },
+    saturday: { avg: 3156, rank: 6 },
+  },
+  // Length insights
+  length: {
+    longFormMultiplier: 2.3, // 200+ chars do 2.3x better
+    shortFormThreshold: 200,
+  },
+  // Formula templates for high-performing tweets
+  formulas: [
+    {
+      name: 'Personal + Tech',
+      pattern: 'I [life moment]. [Tech] made it [better]...',
+      example: 'I almost missed my daughter\'s recital. AI scheduling saved the day and now I never double-book...',
+      category: 'personal',
+    },
+    {
+      name: 'Breaking Alpha',
+      pattern: 'BREAKING - [Project] alpha. Sign up ASAP...',
+      example: 'BREAKING - New AI tool alpha. Sign up ASAP before waitlist closes...',
+      category: 'alpha',
+    },
+    {
+      name: 'Hot Take Defense',
+      pattern: '[Complaint] is wrong. Here\'s what people miss...',
+      example: '"AI is overhyped" is wrong. Here\'s what people miss: it\'s not about replacement, it\'s about augmentation...',
+      category: 'alpha',
+    },
+    {
+      name: 'Announcement + CTA',
+      pattern: 'I\'m launching [thing]. Who wants to...',
+      example: 'I\'m launching a free course on X growth. Who wants early access?',
+      category: 'announcements',
+    },
+    {
+      name: 'Vulnerable Honesty',
+      pattern: '[Topic] is stigmatized. [Personal experience]...',
+      example: 'Burnout is stigmatized. I crashed hard last year. Here\'s what actually helped me recover...',
+      category: 'personal',
+    },
+  ],
+};
+
+// Detect content category based on Shane's benchmarks
+function detectShaneBenchmarkCategory(text) {
+  const lowerText = text.toLowerCase();
+  const charCount = text.length;
+
+  // Check for long-form first (if 200+ chars)
+  const isLongForm = charCount >= SHANE_BENCHMARKS.length.shortFormThreshold;
+
+  // Check each category for keyword matches
+  const categoryScores = {};
+
+  for (const [key, category] of Object.entries(SHANE_BENCHMARKS.categories)) {
+    if (key === 'longform' || key === 'general') continue;
+
+    const keywords = category.keywords || [];
+    const matches = keywords.filter(kw => lowerText.includes(kw.toLowerCase()));
+    categoryScores[key] = matches.length;
+  }
+
+  // Find the best matching category
+  const bestCategory = Object.entries(categoryScores)
+    .sort((a, b) => b[1] - a[1])
+    .find(([_, score]) => score > 0);
+
+  if (bestCategory) {
+    return {
+      category: bestCategory[0],
+      ...SHANE_BENCHMARKS.categories[bestCategory[0]],
+      isLongForm,
+      matchedKeywords: bestCategory[1],
+    };
+  }
+
+  // Default to longform if 200+ chars, otherwise general
+  if (isLongForm) {
+    return {
+      category: 'longform',
+      ...SHANE_BENCHMARKS.categories.longform,
+      isLongForm: true,
+      matchedKeywords: 0,
+    };
+  }
+
+  return {
+    category: 'general',
+    ...SHANE_BENCHMARKS.categories.general,
+    isLongForm: false,
+    matchedKeywords: 0,
+  };
+}
+
+// Calculate predicted performance based on Shane's benchmarks
+function calculateShanePerformance(text, contentTypes) {
+  const category = detectShaneBenchmarkCategory(text);
+  const charCount = text.length;
+
+  // Base prediction from category
+  let predictedImpressions = category.avg;
+
+  // Apply long-form multiplier if applicable
+  if (charCount >= SHANE_BENCHMARKS.length.shortFormThreshold) {
+    predictedImpressions *= SHANE_BENCHMARKS.length.longFormMultiplier;
+  }
+
+  // Determine performance level
+  let performanceLevel = 'average';
+  let performanceColor = '#FF9800';
+
+  if (predictedImpressions >= SHANE_BENCHMARKS.impressions.viral) {
+    performanceLevel = 'viral';
+    performanceColor = '#4CAF50';
+  } else if (predictedImpressions >= SHANE_BENCHMARKS.impressions.average) {
+    performanceLevel = 'above average';
+    performanceColor = '#4CAF50';
+  } else if (predictedImpressions < SHANE_BENCHMARKS.impressions.median) {
+    performanceLevel = 'below average';
+    performanceColor = '#F44336';
+  }
+
+  // Get best day recommendation
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+  const todayData = SHANE_BENCHMARKS.timing[today];
+  const bestDays = Object.entries(SHANE_BENCHMARKS.timing)
+    .sort((a, b) => a[1].rank - b[1].rank)
+    .slice(0, 2)
+    .map(([day]) => day.charAt(0).toUpperCase() + day.slice(1));
+
+  return {
+    category,
+    predictedImpressions: Math.round(predictedImpressions),
+    performanceLevel,
+    performanceColor,
+    vsAverage: ((predictedImpressions / SHANE_BENCHMARKS.impressions.average - 1) * 100).toFixed(0),
+    vsMedian: ((predictedImpressions / SHANE_BENCHMARKS.impressions.median - 1) * 100).toFixed(0),
+    bestDays,
+    todayRank: todayData?.rank || 4,
+    isLongForm: charCount >= SHANE_BENCHMARKS.length.shortFormThreshold,
+    charCount,
+  };
+}
+
 // Style profiles with adjustments
 const STYLE_PROFILES = {
   general: { name: 'General', adjustments: {} },
@@ -1366,6 +1533,9 @@ export default function App() {
   const rewriteVariations = generateRewriteVariations(tweetText);
   const smartSuggestions = generateSmartSuggestions(tweetText);
 
+  // Shane's Performance Benchmarks
+  const shanePerformance = calculateShanePerformance(tweetText, contentTypes);
+
   const contentTypeOptions = ['video', 'image', 'poll', 'thread', 'gif', 'link'];
 
   return (
@@ -1846,6 +2016,252 @@ export default function App() {
                     </button>
                   ))}
                 </div>
+              </div>
+            </div>
+
+            {/* Shane's Performance Benchmarks */}
+            {tweetText && (
+              <div style={{ ...STYLES.card, marginTop: '20px' }}>
+                <h3 style={{ marginBottom: '15px', color: COLORS.text, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '16px' }}>Performance Prediction</span>
+                  <span style={{
+                    fontSize: '10px',
+                    background: COLORS.primary + '20',
+                    color: COLORS.primary,
+                    padding: '2px 8px',
+                    borderRadius: '10px',
+                    fontWeight: '600',
+                  }}>
+                    Shane's Benchmarks
+                  </span>
+                </h3>
+
+                {/* Predicted Impressions */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '15px',
+                  background: shanePerformance.performanceColor + '10',
+                  borderRadius: '12px',
+                  marginBottom: '15px',
+                }}>
+                  <div>
+                    <div style={{ fontSize: '12px', color: COLORS.textLight, marginBottom: '4px' }}>
+                      Predicted Impressions
+                    </div>
+                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: shanePerformance.performanceColor }}>
+                      {shanePerformance.predictedImpressions.toLocaleString()}
+                    </div>
+                    <div style={{ fontSize: '12px', color: COLORS.textLight }}>
+                      {shanePerformance.vsAverage > 0 ? '+' : ''}{shanePerformance.vsAverage}% vs avg ({SHANE_BENCHMARKS.impressions.average.toLocaleString()})
+                    </div>
+                  </div>
+                  <div style={{
+                    padding: '8px 16px',
+                    background: shanePerformance.performanceColor,
+                    color: COLORS.white,
+                    borderRadius: '20px',
+                    fontWeight: '600',
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                  }}>
+                    {shanePerformance.performanceLevel}
+                  </div>
+                </div>
+
+                {/* Content Category */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, 1fr)',
+                  gap: '12px',
+                  marginBottom: '15px',
+                }}>
+                  <div style={{
+                    padding: '12px',
+                    background: COLORS.background,
+                    borderRadius: '8px',
+                  }}>
+                    <div style={{ fontSize: '11px', color: COLORS.textLight, marginBottom: '4px' }}>
+                      Detected Category
+                    </div>
+                    <div style={{ fontWeight: '600', color: COLORS.text }}>
+                      {shanePerformance.category.label}
+                    </div>
+                    <div style={{ fontSize: '11px', color: COLORS.textLight }}>
+                      Avg: {shanePerformance.category.avg?.toLocaleString()} impressions
+                    </div>
+                  </div>
+                  <div style={{
+                    padding: '12px',
+                    background: COLORS.background,
+                    borderRadius: '8px',
+                  }}>
+                    <div style={{ fontSize: '11px', color: COLORS.textLight, marginBottom: '4px' }}>
+                      Length Bonus
+                    </div>
+                    <div style={{ fontWeight: '600', color: shanePerformance.isLongForm ? COLORS.success : COLORS.textLight }}>
+                      {shanePerformance.isLongForm ? '2.3x Multiplier Active' : 'No Bonus'}
+                    </div>
+                    <div style={{ fontSize: '11px', color: COLORS.textLight }}>
+                      {shanePerformance.charCount}/200 chars for bonus
+                    </div>
+                  </div>
+                </div>
+
+                {/* Best Days to Post */}
+                <div style={{
+                  padding: '12px',
+                  background: COLORS.background,
+                  borderRadius: '8px',
+                  marginBottom: '15px',
+                }}>
+                  <div style={{ fontSize: '11px', color: COLORS.textLight, marginBottom: '6px' }}>
+                    Best Days to Post
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    {shanePerformance.bestDays.map((day, i) => (
+                      <span key={day} style={{
+                        padding: '4px 12px',
+                        background: i === 0 ? COLORS.success : COLORS.success + '40',
+                        color: i === 0 ? COLORS.white : COLORS.success,
+                        borderRadius: '12px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                      }}>
+                        {day}
+                      </span>
+                    ))}
+                    <span style={{ fontSize: '11px', color: COLORS.textLight, marginLeft: '8px' }}>
+                      Worst: Friday
+                    </span>
+                  </div>
+                </div>
+
+                {/* Category Performance Table */}
+                <div style={{ marginBottom: '15px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: '600', color: COLORS.text, marginBottom: '8px' }}>
+                    Content Type Performance
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    {Object.entries(SHANE_BENCHMARKS.categories)
+                      .sort((a, b) => b[1].avg - a[1].avg)
+                      .map(([key, cat]) => (
+                        <div key={key} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '8px 12px',
+                          background: shanePerformance.category.category === key ? COLORS.primary + '15' : COLORS.background,
+                          borderRadius: '6px',
+                          border: shanePerformance.category.category === key ? `1px solid ${COLORS.primary}40` : 'none',
+                        }}>
+                          <div style={{
+                            width: '100px',
+                            fontSize: '12px',
+                            fontWeight: shanePerformance.category.category === key ? '600' : '400',
+                            color: shanePerformance.category.category === key ? COLORS.primary : COLORS.text,
+                          }}>
+                            {cat.label}
+                          </div>
+                          <div style={{
+                            flex: 1,
+                            height: '8px',
+                            background: '#E0E0E0',
+                            borderRadius: '4px',
+                            overflow: 'hidden',
+                          }}>
+                            <div style={{
+                              height: '100%',
+                              width: `${(cat.avg / 7388) * 100}%`,
+                              background: shanePerformance.category.category === key ? COLORS.primary : COLORS.textLight,
+                              borderRadius: '4px',
+                            }} />
+                          </div>
+                          <div style={{
+                            width: '60px',
+                            textAlign: 'right',
+                            fontSize: '11px',
+                            fontWeight: '600',
+                            color: shanePerformance.category.category === key ? COLORS.primary : COLORS.textLight,
+                          }}>
+                            {cat.avg.toLocaleString()}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Tips based on category */}
+                {shanePerformance.category.category === 'general' && (
+                  <div style={{
+                    padding: '12px',
+                    background: COLORS.warning + '15',
+                    borderRadius: '8px',
+                    borderLeft: `3px solid ${COLORS.warning}`,
+                  }}>
+                    <div style={{ fontWeight: '600', fontSize: '12px', color: COLORS.warning, marginBottom: '4px' }}>
+                      Tip: Add a Hook
+                    </div>
+                    <div style={{ fontSize: '12px', color: COLORS.text }}>
+                      General posts average only 1,515 impressions. Try adding personal context, tips, or making an announcement for 2-5x better performance.
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Formula Templates */}
+            <div style={{ ...STYLES.card, marginTop: '20px' }}>
+              <h3 style={{ marginBottom: '15px', color: COLORS.text }}>
+                High-Performing Formulas
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {SHANE_BENCHMARKS.formulas.map((formula, i) => (
+                  <div key={i} style={{
+                    padding: '12px',
+                    background: COLORS.background,
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = COLORS.primary + '10'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = COLORS.background}
+                  onClick={() => setTweetText(formula.example)}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+                      <div style={{ fontWeight: '600', fontSize: '13px', color: COLORS.primary }}>
+                        {formula.name}
+                      </div>
+                      <span style={{
+                        fontSize: '10px',
+                        background: COLORS.success + '20',
+                        color: COLORS.success,
+                        padding: '2px 8px',
+                        borderRadius: '10px',
+                        fontWeight: '600',
+                      }}>
+                        {SHANE_BENCHMARKS.categories[formula.category]?.label || formula.category}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '12px', color: COLORS.textLight, marginBottom: '8px', fontStyle: 'italic' }}>
+                      {formula.pattern}
+                    </div>
+                    <div style={{
+                      fontSize: '12px',
+                      color: COLORS.text,
+                      padding: '8px',
+                      background: COLORS.white,
+                      borderRadius: '6px',
+                      borderLeft: `2px solid ${COLORS.primary}`,
+                    }}>
+                      {formula.example}
+                    </div>
+                    <div style={{ fontSize: '10px', color: COLORS.textLight, marginTop: '6px', textAlign: 'right' }}>
+                      Click to use this template
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
