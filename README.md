@@ -43,6 +43,21 @@ This repo also contains data-driven learnings from analyzing ~3 months of X cont
 4. **Announcement + CTA**: "I'm launching [thing]. Who wants to [action]?"
 5. **Vulnerable Honesty**: "[Topic] is stigmatized. [Personal experience]..."
 
+## Results: Content Assistant Impact
+
+After building this content assistant, here's the week-over-week comparison:
+
+| Metric | Week 1 (Jan 13-19) | Week 2 (Jan 20-27) | Change |
+|--------|-------------------|-------------------|--------|
+| Impressions | 212K | 309K | **+46%** |
+| Bookmarks | 201 | 601 | **+199%** |
+| New Followers | 140 | 172 | **+23%** |
+| Engagements | 11.7K | 13.3K | +13% |
+| Posts Created | 36 | 13 | -64% |
+| Avg Impressions/Post | 1,807 | 10,199 | **+464%** |
+
+**Key insight**: Posted 64% less, got 46% more impressions. Quality > quantity.
+
 ## Getting Started
 
 ### Prerequisites
@@ -114,7 +129,8 @@ Open [http://localhost:3001](http://localhost:3001) to view the app.
 ## Data Files
 
 Located in the `/data` folder:
-- `account_analytics_content_*.csv` - Raw analytics export from X
+- `account_overview_analytics.csv` - Daily account metrics (impressions, followers, etc.)
+- `account_analytics_content_*.csv` - Post-level analytics export from X
 - `X_Tweet_Analysis_Shane.xlsx` - Detailed analysis spreadsheet
 - `X_Content_Playbook_Shane.docx` - Content strategy document
 - `X_Content_Learnings*.md` - Quick reference for content rules
