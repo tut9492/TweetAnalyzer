@@ -47,16 +47,16 @@ This repo also contains data-driven learnings from analyzing ~3 months of X cont
 
 After building this content assistant, here's the week-over-week comparison:
 
-| Metric | Week 1 (Jan 13-19) | Week 2 (Jan 20-27) | Change |
+| Metric | Week 1 (Jan 13-19) | Week 2 (Jan 20-26) | Change |
 |--------|-------------------|-------------------|--------|
-| Impressions | 212K | 309K | **+46%** |
-| Bookmarks | 201 | 601 | **+199%** |
-| New Followers | 140 | 172 | **+23%** |
-| Engagements | 11.7K | 13.3K | +13% |
+| Impressions | 212K | 303K | **+43%** |
+| Bookmarks | 201 | 599 | **+198%** |
+| New Followers | 140 | 163 | **+16%** |
+| Engagements | 11.7K | 13.0K | +11% |
 | Posts Created | 36 | 13 | -64% |
-| Avg Impressions/Post | 1,807 | 10,199 | **+464%** |
+| Avg Impressions/Post | 5,895 | 23,315 | **+295%** |
 
-**Key insight**: Posted 64% less, got 46% more impressions. Quality > quantity.
+**Key insight**: Posted 64% fewer times, got 43% more impressions. Quality > quantity.
 
 ## Getting Started
 
