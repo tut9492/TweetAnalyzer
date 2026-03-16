@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tweet Analysis Comparison</title>
+    <title>Cost Comparison</title>
     <style>
         * {
             margin: 0;
@@ -23,8 +23,15 @@
             font-size: 3rem;
             font-weight: 800;
             color: #2d2d2d;
-            margin-bottom: 50px;
+            margin-bottom: 20px;
             letter-spacing: -1px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 50px;
+            font-size: 1.1rem;
         }
 
         .container {
@@ -41,7 +48,7 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            min-width: 380px;
+            min-width: 400px;
         }
 
         .table-header {
@@ -67,7 +74,7 @@
             letter-spacing: 1px;
             text-transform: uppercase;
             color: #333;
-            text-align: center;
+            text-align: right;
         }
 
         /* Left table - coral/pink theme */
@@ -96,7 +103,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             border-right: 1px solid #eee;
         }
 
@@ -104,7 +111,7 @@
             flex: 2;
             padding: 15px;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: #444;
@@ -113,93 +120,131 @@
         .row-value {
             flex: 1;
             padding: 15px 20px;
-            text-align: center;
+            text-align: right;
             font-weight: 600;
             color: #666;
             font-size: 0.95rem;
         }
 
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 1.1rem;
+        /* Total section */
+        .total-section {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-top: 50px;
+            flex-wrap: wrap;
         }
 
-        /* Highlight values */
-        .highlight-good {
+        .total-box {
+            background: white;
+            border-radius: 12px;
+            padding: 30px 50px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            min-width: 300px;
+        }
+
+        .total-label {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #888;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .total-amount {
+            font-size: 3.5rem;
+            font-weight: 800;
+        }
+
+        .total-bad {
+            color: #c62828;
+        }
+
+        .total-good {
+            color: #2e7d32;
+        }
+
+        .total-note {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        .savings {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 1.5rem;
             color: #2e7d32;
             font-weight: 700;
-        }
-
-        .highlight-bad {
-            color: #c62828;
-            font-weight: 700;
-        }
-
-        .total-row {
-            background: #f5f5f5;
-        }
-
-        .total-row .row-label,
-        .total-row .row-value {
-            font-weight: 800;
-            font-size: 1rem;
         }
     </style>
 </head>
 <body>
-    <h1>Tweet Analysis Comparison</h1>
-    <p class="subtitle">Analyzing 50 tweets with sentiment, topics, and visualizations</p>
+    <h1>Cost Comparison</h1>
+    <p class="subtitle">Annual cost to run your business operations</p>
 
     <div class="container">
-        <!-- Left Table: Real Life Simulation -->
+        <!-- Left Table: Real Life Simulation (Employees) -->
         <div class="table-wrapper left-table">
             <div class="table-header">
                 <div class="header-title">Real Life Simulation</div>
-                <div class="header-amount">Amount</div>
+                <div class="header-amount">Yearly Salary</div>
             </div>
 
             <div class="table-row">
-                <div class="row-icon">📋</div>
-                <div class="row-label">Planning & Research</div>
-                <div class="row-value">2 hours</div>
-            </div>
-
-            <div class="table-row">
-                <div class="row-icon">🔧</div>
-                <div class="row-label">Setup & Config</div>
-                <div class="row-value">1 hour</div>
+                <div class="row-icon">🎨</div>
+                <div class="row-label">Designer</div>
+                <div class="row-value">$65,000</div>
             </div>
 
             <div class="table-row">
                 <div class="row-icon">💻</div>
-                <div class="row-label">Coding</div>
-                <div class="row-value">4 hours</div>
+                <div class="row-label">Developer</div>
+                <div class="row-value">$95,000</div>
             </div>
 
             <div class="table-row">
-                <div class="row-icon">🐛</div>
-                <div class="row-label">Debugging</div>
-                <div class="row-value">2 hours</div>
+                <div class="row-icon">✍️</div>
+                <div class="row-label">Copywriter</div>
+                <div class="row-value">$55,000</div>
+            </div>
+
+            <div class="table-row">
+                <div class="row-icon">🎬</div>
+                <div class="row-label">Video Editor</div>
+                <div class="row-value">$58,000</div>
             </div>
 
             <div class="table-row">
                 <div class="row-icon">📊</div>
-                <div class="row-label">Visualization</div>
-                <div class="row-value">2 hours</div>
+                <div class="row-label">Data Analyst</div>
+                <div class="row-value">$72,000</div>
             </div>
 
             <div class="table-row">
-                <div class="row-icon">📝</div>
-                <div class="row-label">Documentation</div>
-                <div class="row-value">1 hour</div>
+                <div class="row-icon">🎧</div>
+                <div class="row-label">Customer Support</div>
+                <div class="row-value">$42,000</div>
             </div>
 
-            <div class="table-row total-row">
-                <div class="row-icon">⏱️</div>
-                <div class="row-label">Total Time</div>
-                <div class="row-value highlight-bad">12 hours</div>
+            <div class="table-row">
+                <div class="row-icon">📱</div>
+                <div class="row-label">Social Media Manager</div>
+                <div class="row-value">$52,000</div>
+            </div>
+
+            <div class="table-row">
+                <div class="row-icon">🔍</div>
+                <div class="row-label">Researcher</div>
+                <div class="row-value">$62,000</div>
+            </div>
+
+            <div class="table-row">
+                <div class="row-icon">📋</div>
+                <div class="row-label">Admin Assistant</div>
+                <div class="row-value">$45,000</div>
             </div>
         </div>
 
@@ -207,51 +252,32 @@
         <div class="table-wrapper right-table">
             <div class="table-header">
                 <div class="header-title">Claude Code</div>
-                <div class="header-amount">Amount</div>
-            </div>
-
-            <div class="table-row">
-                <div class="row-icon">💬</div>
-                <div class="row-label">Describe Task</div>
-                <div class="row-value">2 mins</div>
-            </div>
-
-            <div class="table-row">
-                <div class="row-icon">⚡</div>
-                <div class="row-label">Auto Setup</div>
-                <div class="row-value">1 min</div>
+                <div class="header-amount">Monthly Cost</div>
             </div>
 
             <div class="table-row">
                 <div class="row-icon">🤖</div>
-                <div class="row-label">Auto Coding</div>
-                <div class="row-value">5 mins</div>
-            </div>
-
-            <div class="table-row">
-                <div class="row-icon">✅</div>
-                <div class="row-label">Auto Debug</div>
-                <div class="row-value">2 mins</div>
-            </div>
-
-            <div class="table-row">
-                <div class="row-icon">📈</div>
-                <div class="row-label">Auto Charts</div>
-                <div class="row-value">2 mins</div>
-            </div>
-
-            <div class="table-row">
-                <div class="row-icon">📄</div>
-                <div class="row-label">Auto Docs</div>
-                <div class="row-value">1 min</div>
-            </div>
-
-            <div class="table-row total-row">
-                <div class="row-icon">🚀</div>
-                <div class="row-label">Total Time</div>
-                <div class="row-value highlight-good">13 mins</div>
+                <div class="row-label">Claude Code Subscription</div>
+                <div class="row-value">$150/mo</div>
             </div>
         </div>
     </div>
+
+    <!-- Large Totals -->
+    <div class="total-section">
+        <div class="total-box">
+            <div class="total-label">Real Life Simulation</div>
+            <div class="total-amount total-bad">$546,000</div>
+            <div class="total-note">per year</div>
+        </div>
+
+        <div class="total-box">
+            <div class="total-label">Claude Code</div>
+            <div class="total-amount total-good">$1,800</div>
+            <div class="total-note">per year ($150/mo)</div>
+        </div>
+    </div>
+
+    <div class="savings">Save over $544,000 per year</div>
 </body>
 </html>
