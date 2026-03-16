@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tweet Analysis Comparison</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e8e4e0;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 800;
+            color: #2d2d2d;
+            margin-bottom: 50px;
+            letter-spacing: -1px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .table-wrapper {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            min-width: 380px;
+        }
+
+        .table-header {
+            display: flex;
+            padding: 0;
+        }
+
+        .header-title {
+            flex: 2;
+            padding: 15px 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #333;
+        }
+
+        .header-amount {
+            flex: 1;
+            padding: 15px 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #333;
+            text-align: center;
+        }
+
+        /* Left table - coral/pink theme */
+        .left-table .table-header {
+            background: #e8a5a5;
+        }
+
+        /* Right table - orange/yellow theme */
+        .right-table .table-header {
+            background: #f5c882;
+        }
+
+        .table-row {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .row-icon {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border-right: 1px solid #eee;
+        }
+
+        .row-label {
+            flex: 2;
+            padding: 15px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #444;
+        }
+
+        .row-value {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            font-weight: 600;
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        /* Highlight values */
+        .highlight-good {
+            color: #2e7d32;
+            font-weight: 700;
+        }
+
+        .highlight-bad {
+            color: #c62828;
+            font-weight: 700;
+        }
+
+        .total-row {
+            background: #f5f5f5;
+        }
+
+        .total-row .row-label,
+        .total-row .row-value {
+            font-weight: 800;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tweet Analysis Comparison</h1>
+    <p class="subtitle">Analyzing 50 tweets with sentiment, topics, and visualizations</p>
+
+    <div class="container">
+        <!-- Left Table: Real Life Simulation -->
+        <div class="table-wrapper left-table">
+            <div class="table-header">
+                <div class="header-title">Real Life Simulation</div>
+                <div class="header-amount">Amount</div>
+            </div>
+
+            <div class="table-row">
+                <div class="row-icon">📋</div>
+                <div class="row-label">Planning & Research</div>
+                <div class="row-value">2 hours</div>
+            </div>
+
+            <div class="table-row">
+                <div class="row-icon">🔧</div>
+                <div class="row-label">Setup & Config</div>
+                <div class="row-value">1 hour</div>
+            </div>
+
+            <div class="table-row">
+                <div class="row-icon">💻</div>
+                <div class="row-label">Coding</div>
+                <div class="row-value">4 hours</div>
+            </div>
+
+            <div class="table-row">
+                <div class="row-icon">🐛</div>
+                <div class="row-label">Debugging</div>
+                <div class="row-value">2 hours</div>
+            </div>
+
+            <div class="table-row">
+                <div class="row-icon">📊</div>
+                <div class="row-label">Visualization</div>
+                <div class="row-value">2 hours</div>
+            </div>
+
+            <div class="table-row">
+                <div class="row-icon">📝</div>
+                <div class="row-label">Documentation</div>
+                <div class="row-value">1 hour</div>
+            </div>
+
+            <div class="table-row total-row">
+                <div class="row-icon">⏱️</div>
+                <div class="row-label">Total Time</div>
+                <div class="row-value highlight-bad">12 hours</div>
+            </div>
+        </div>
+
+        <!-- Right Table: Claude Code -->
+        <div class="table-wrapper right-table">
+            <div class="table-header">
+                <div class="header-title">Claude Code</div>
+                <div class="header-amount">Amount</div>
+            </div>
+
+            <div class="table-row">
+                <div class="row-icon">💬</div>
+                <div class="row-label">Describe Task</div>
+                <div class="row-value">2 mins</div>
+            </div>
+
+            <div class="table-row">
+                <div class="row-icon">⚡</div>
+                <div class="row-label">Auto Setup</div>
+                <div class="row-value">1 min</div>
+            </div>
+
+            <div class="table-row">
+                <div class="row-icon">🤖</div>
+                <div class="row-label">Auto Coding</div>
+                <div class="row-value">5 mins</div>
+            </div>
+
+            <div class="table-row">
+                <div class="row-icon">✅</div>
+                <div class="row-label">Auto Debug</div>
+                <div class="row-value">2 mins</div>
+            </div>
+
+            <div class="table-row">
+                <div class="row-icon">📈</div>
+                <div class="row-label">Auto Charts</div>
+                <div class="row-value">2 mins</div>
+            </div>
+
+            <div class="table-row">
+                <div class="row-icon">📄</div>
+                <div class="row-label">Auto Docs</div>
+                <div class="row-value">1 min</div>
+            </div>
+
+            <div class="table-row total-row">
+                <div class="row-icon">🚀</div>
+                <div class="row-label">Total Time</div>
+                <div class="row-value highlight-good">13 mins</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
