@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Cost Reality Check</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 48px;
+            max-width: 600px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .header h1 {
+            color: #fff;
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .comparison {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .cost-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1rem;
+            width: 100px;
+            flex-shrink: 0;
+        }
+
+        .bar-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .bar {
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .bar-payroll {
+            width: 100%;
+            background: linear-gradient(90deg, #ff6b6b 0%, #ee5a5a 100%);
+        }
+
+        .bar-ai {
+            width: 1.1%;
+            min-width: 60px;
+            background: linear-gradient(90deg, #4ade80 0%, #22c55e 100%);
+        }
+
+        .amount {
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .amount-outside {
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-left: 16px;
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 16px 0;
+        }
+
+        .insight {
+            text-align: center;
+            margin-top: 40px;
+            padding: 24px;
+            background: rgba(74, 222, 128, 0.1);
+            border-radius: 16px;
+            border: 1px solid rgba(74, 222, 128, 0.2);
+        }
+
+        .insight-number {
+            color: #4ade80;
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .insight-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 32px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="header">
+            <h1>My monthly engineering costs</h1>
+        </div>
+
+        <div class="comparison">
+            <div class="cost-row">
+                <span class="label">Payroll</span>
+                <div class="bar-container">
+                    <div class="bar bar-payroll">
+                        <span class="amount">$1.4M</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cost-row">
+                <span class="label">AI</span>
+                <div class="bar-container">
+                    <div class="bar bar-ai"></div>
+                    <span class="amount-outside">$150</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="insight">
+            <div class="insight-number">0.01%</div>
+            <div class="insight-text">AI is 0.01% of payroll cost</div>
+        </div>
+
+        <div class="footer">
+            The multiplier opportunity everyone's missing
+        </div>
+    </div>
+</body>
+</html>
