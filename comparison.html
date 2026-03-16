@@ -39,7 +39,7 @@
             justify-content: center;
             gap: 60px;
             flex-wrap: wrap;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
@@ -48,7 +48,14 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            min-width: 400px;
+        }
+
+        .left-table {
+            min-width: 520px;
+        }
+
+        .right-table {
+            min-width: 380px;
         }
 
         .table-header {
@@ -75,14 +82,13 @@
             text-transform: uppercase;
             color: #333;
             text-align: right;
+            min-width: 100px;
         }
 
-        /* Left table - coral/pink theme */
         .left-table .table-header {
             background: #e8a5a5;
         }
 
-        /* Right table - orange/yellow theme */
         .right-table .table-header {
             background: #f5c882;
         }
@@ -105,13 +111,14 @@
             justify-content: center;
             font-size: 1.4rem;
             border-right: 1px solid #eee;
+            flex-shrink: 0;
         }
 
         .row-label {
             flex: 2;
             padding: 15px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: #444;
@@ -124,6 +131,7 @@
             font-weight: 600;
             color: #666;
             font-size: 0.95rem;
+            min-width: 100px;
         }
 
         /* Total section */
@@ -131,17 +139,17 @@
             display: flex;
             justify-content: center;
             gap: 60px;
-            margin-top: 50px;
+            margin-top: 60px;
             flex-wrap: wrap;
         }
 
         .total-box {
             background: white;
             border-radius: 12px;
-            padding: 30px 50px;
+            padding: 40px 60px;
             text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            min-width: 300px;
+            min-width: 320px;
         }
 
         .total-label {
@@ -149,13 +157,14 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             color: #888;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             font-weight: 600;
         }
 
         .total-amount {
-            font-size: 3.5rem;
+            font-size: 4rem;
             font-weight: 800;
+            line-height: 1;
         }
 
         .total-bad {
@@ -167,15 +176,15 @@
         }
 
         .total-note {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: #999;
-            margin-top: 8px;
+            margin-top: 12px;
         }
 
         .savings {
             text-align: center;
-            margin-top: 40px;
-            font-size: 1.5rem;
+            margin-top: 50px;
+            font-size: 1.8rem;
             color: #2e7d32;
             font-weight: 700;
         }
@@ -183,7 +192,7 @@
 </head>
 <body>
     <h1>Cost Comparison</h1>
-    <p class="subtitle">Annual cost to run your business operations</p>
+    <p class="subtitle">Annual cost to run your operations</p>
 
     <div class="container">
         <!-- Left Table: Real Life Simulation (Employees) -->
@@ -194,57 +203,57 @@
             </div>
 
             <div class="table-row">
-                <div class="row-icon">🎨</div>
-                <div class="row-label">Designer</div>
-                <div class="row-value">$65,000</div>
+                <div class="row-icon">💻</div>
+                <div class="row-label">Full-Stack Developer</div>
+                <div class="row-value">$140,000</div>
             </div>
 
             <div class="table-row">
-                <div class="row-icon">💻</div>
-                <div class="row-label">Developer</div>
+                <div class="row-icon">🔧</div>
+                <div class="row-label">DevOps / Infra Engineer</div>
+                <div class="row-value">$135,000</div>
+            </div>
+
+            <div class="table-row">
+                <div class="row-icon">🔒</div>
+                <div class="row-label">Security Engineer</div>
+                <div class="row-value">$155,000</div>
+            </div>
+
+            <div class="table-row">
+                <div class="row-icon">📣</div>
+                <div class="row-label">Marketing / Copywriter</div>
                 <div class="row-value">$95,000</div>
             </div>
 
             <div class="table-row">
-                <div class="row-icon">✍️</div>
-                <div class="row-label">Copywriter</div>
-                <div class="row-value">$55,000</div>
-            </div>
-
-            <div class="table-row">
-                <div class="row-icon">🎬</div>
-                <div class="row-label">Video Editor</div>
-                <div class="row-value">$58,000</div>
+                <div class="row-icon">📋</div>
+                <div class="row-label">Product Manager</div>
+                <div class="row-value">$130,000</div>
             </div>
 
             <div class="table-row">
                 <div class="row-icon">📊</div>
                 <div class="row-label">Data Analyst</div>
-                <div class="row-value">$72,000</div>
+                <div class="row-value">$85,000</div>
             </div>
 
             <div class="table-row">
-                <div class="row-icon">🎧</div>
-                <div class="row-label">Customer Support</div>
-                <div class="row-value">$42,000</div>
+                <div class="row-icon">✍️</div>
+                <div class="row-label">Technical Writer / Editor</div>
+                <div class="row-value">$87,000</div>
             </div>
 
             <div class="table-row">
-                <div class="row-icon">📱</div>
-                <div class="row-label">Social Media Manager</div>
-                <div class="row-value">$52,000</div>
+                <div class="row-icon">🖥️</div>
+                <div class="row-label">IT Support / Sysadmin</div>
+                <div class="row-value">$90,000</div>
             </div>
 
             <div class="table-row">
-                <div class="row-icon">🔍</div>
-                <div class="row-label">Researcher</div>
-                <div class="row-value">$62,000</div>
-            </div>
-
-            <div class="table-row">
-                <div class="row-icon">📋</div>
-                <div class="row-label">Admin Assistant</div>
-                <div class="row-value">$45,000</div>
+                <div class="row-icon">⛓️</div>
+                <div class="row-label">Web3 / Blockchain Consultant</div>
+                <div class="row-value">$160,000</div>
             </div>
         </div>
 
@@ -267,8 +276,8 @@
     <div class="total-section">
         <div class="total-box">
             <div class="total-label">Real Life Simulation</div>
-            <div class="total-amount total-bad">$546,000</div>
-            <div class="total-note">per year</div>
+            <div class="total-amount total-bad">$1.4M</div>
+            <div class="total-note">per year (fully loaded with benefits)</div>
         </div>
 
         <div class="total-box">
@@ -278,6 +287,6 @@
         </div>
     </div>
 
-    <div class="savings">Save over $544,000 per year</div>
+    <div class="savings">Save over $1.39M per year</div>
 </body>
 </html>
