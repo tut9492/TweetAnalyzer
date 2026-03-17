@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X Analytics Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e7e9ea;
+            padding: 40px 20px;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #1d9bf0, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            color: #71767b;
+            font-size: 1rem;
+            margin-bottom: 40px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: #16181c;
+            border: 1px solid #2f3336;
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .stat-label {
+            color: #71767b;
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+        .stat-change {
+            font-size: 0.875rem;
+            margin-top: 8px;
+        }
+        .positive { color: #00ba7c; }
+        .negative { color: #f4212e; }
+
+        .section {
+            background: #16181c;
+            border: 1px solid #2f3336;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .section h2 {
+            font-size: 1.25rem;
+            margin-bottom: 20px;
+            color: #e7e9ea;
+        }
+
+        .content-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .content-table th,
+        .content-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #2f3336;
+        }
+        .content-table th {
+            color: #71767b;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        .content-table tr:last-child td {
+            border-bottom: none;
+        }
+        .content-table tr:hover {
+            background: #1d1f23;
+        }
+
+        .bar-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .bar {
+            height: 8px;
+            background: linear-gradient(90deg, #1d9bf0, #8b5cf6);
+            border-radius: 4px;
+        }
+        .bar-label {
+            font-size: 0.875rem;
+            color: #71767b;
+            min-width: 50px;
+        }
+
+        .top-posts {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .post-card {
+            background: #1d1f23;
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .post-text {
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+        .post-metrics {
+            display: flex;
+            gap: 24px;
+            color: #71767b;
+            font-size: 0.875rem;
+        }
+        .post-metric {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .insights-list {
+            list-style: none;
+        }
+        .insights-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #2f3336;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .insights-list li:last-child {
+            border-bottom: none;
+        }
+        .insight-icon {
+            font-size: 1.25rem;
+        }
+
+        .day-chart {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 150px;
+            padding-top: 20px;
+        }
+        .day-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 12%;
+        }
+        .day-bar-fill {
+            width: 100%;
+            max-width: 40px;
+            background: linear-gradient(180deg, #1d9bf0, #8b5cf6);
+            border-radius: 4px 4px 0 0;
+            min-height: 4px;
+        }
+        .day-label {
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: #71767b;
+        }
+        .day-value {
+            font-size: 0.75rem;
+            color: #e7e9ea;
+            margin-top: 4px;
+        }
+
+        .formula-card {
+            background: #1d1f23;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .formula-title {
+            font-weight: 600;
+            color: #1d9bf0;
+            margin-bottom: 8px;
+        }
+        .formula-template {
+            font-family: monospace;
+            color: #71767b;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>X Analytics Report</h1>
+        <p class="subtitle">90-day content performance analysis</p>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">521K</div>
+                <div class="stat-label">Total Impressions</div>
+                <div class="stat-change positive">+46% vs prior period</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">802</div>
+                <div class="stat-label">Bookmarks</div>
+                <div class="stat-change positive">+199% vs prior period</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">312</div>
+                <div class="stat-label">New Followers</div>
+                <div class="stat-change positive">+23% vs prior period</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">4.2%</div>
+                <div class="stat-label">Engagement Rate</div>
+                <div class="stat-change positive">+0.8% vs prior period</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Content Performance by Type</h2>
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Content Type</th>
+                        <th>Avg Impressions</th>
+                        <th>Performance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Personal Life (family, vulnerability)</td>
+                        <td>7,388</td>
+                        <td><div class="bar-container"><div class="bar" style="width: 100%"></div><span class="bar-label">Best</span></div></td>
+                    </tr>
+                    <tr>
+                        <td>Announcements ("BREAKING", launches)</td>
+                        <td>5,959</td>
+                        <td><div class="bar-container"><div class="bar" style="width: 81%"></div><span class="bar-label">Strong</span></div></td>
+                    </tr>
+                    <tr>
+                        <td>Alpha/Tips (insider info, actionable)</td>
+                        <td>4,824</td>
+                        <td><div class="bar-container"><div class="bar" style="width: 65%"></div><span class="bar-label">Solid</span></div></td>
+                    </tr>
+                    <tr>
+                        <td>Long-form (200+ chars)</td>
+                        <td>3,890</td>
+                        <td><div class="bar-container"><div class="bar" style="width: 53%"></div><span class="bar-label">+2.3x</span></div></td>
+                    </tr>
+                    <tr>
+                        <td>General/Unthemed</td>
+                        <td>1,515</td>
+                        <td><div class="bar-container"><div class="bar" style="width: 20%"></div><span class="bar-label">Avoid</span></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Best Days to Post</h2>
+            <div class="day-chart">
+                <div class="day-bar">
+                    <div class="day-bar-fill" style="height: 85%"></div>
+                    <div class="day-label">Mon</div>
+                    <div class="day-value">3,343</div>
+                </div>
+                <div class="day-bar">
+                    <div class="day-bar-fill" style="height: 60%"></div>
+                    <div class="day-label">Tue</div>
+                    <div class="day-value">2,891</div>
+                </div>
+                <div class="day-bar">
+                    <div class="day-bar-fill" style="height: 55%"></div>
+                    <div class="day-label">Wed</div>
+                    <div class="day-value">2,756</div>
+                </div>
+                <div class="day-bar">
+                    <div class="day-bar-fill" style="height: 65%"></div>
+                    <div class="day-label">Thu</div>
+                    <div class="day-value">3,012</div>
+                </div>
+                <div class="day-bar">
+                    <div class="day-bar-fill" style="height: 45%"></div>
+                    <div class="day-label">Fri</div>
+                    <div class="day-value">2,781</div>
+                </div>
+                <div class="day-bar">
+                    <div class="day-bar-fill" style="height: 70%"></div>
+                    <div class="day-label">Sat</div>
+                    <div class="day-value">3,156</div>
+                </div>
+                <div class="day-bar">
+                    <div class="day-bar-fill" style="height: 100%"></div>
+                    <div class="day-label">Sun</div>
+                    <div class="day-value">4,988</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Top Performing Posts</h2>
+            <div class="top-posts">
+                <div class="post-card">
+                    <div class="post-text">HOLY F-ING SHIIIIII Fantasy Top is making some moves that I really like. Travis and the boys have built a prediction market on top of X...</div>
+                    <div class="post-metrics">
+                        <span class="post-metric">4,301 impressions</span>
+                        <span class="post-metric">64 likes</span>
+                        <span class="post-metric">26 replies</span>
+                        <span class="post-metric">5 reposts</span>
+                    </div>
+                </div>
+                <div class="post-card">
+                    <div class="post-text">I'm so proud to report that I have never once paid for or used any methods to boost my content impressions...</div>
+                    <div class="post-metrics">
+                        <span class="post-metric">3,643 impressions</span>
+                        <span class="post-metric">72 likes</span>
+                        <span class="post-metric">28 replies</span>
+                        <span class="post-metric">0 reposts</span>
+                    </div>
+                </div>
+                <div class="post-card">
+                    <div class="post-text">I DID IT I solved the X bot problem months ago. It's brilliant. We turn removing AI Slop into a video game...</div>
+                    <div class="post-metrics">
+                        <span class="post-metric">3,545 impressions</span>
+                        <span class="post-metric">77 likes</span>
+                        <span class="post-metric">36 replies</span>
+                        <span class="post-metric">0 reposts</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Winning Content Formulas</h2>
+            <div class="formula-card">
+                <div class="formula-title">Personal + Tech</div>
+                <div class="formula-template">"I [life moment]. [Tech] made it [better]. Here's what happened..."</div>
+            </div>
+            <div class="formula-card">
+                <div class="formula-title">Breaking Alpha</div>
+                <div class="formula-template">"BREAKING - [Project] alpha. Sign up ASAP. [Why]..."</div>
+            </div>
+            <div class="formula-card">
+                <div class="formula-title">Hot Take Defense</div>
+                <div class="formula-template">"[Popular complaint] is wrong. Here's what people miss..."</div>
+            </div>
+            <div class="formula-card">
+                <div class="formula-title">Announcement + CTA</div>
+                <div class="formula-template">"I'm launching [thing]. Who wants to [action]?"</div>
+            </div>
+            <div class="formula-card">
+                <div class="formula-title">Vulnerable Honesty</div>
+                <div class="formula-template">"[Topic] is stigmatized. [Personal experience]..."</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Key Insights</h2>
+            <ul class="insights-list">
+                <li>
+                    <span class="insight-icon">📈</span>
+                    <span><strong>Quality over quantity:</strong> Posting 64% less resulted in 46% more impressions. Focus on fewer, higher-quality posts.</span>
+                </li>
+                <li>
+                    <span class="insight-icon">📅</span>
+                    <span><strong>Sunday is king:</strong> Posts on Sunday average 4,988 impressions vs 2,781 on Friday (worst day).</span>
+                </li>
+                <li>
+                    <span class="insight-icon">💭</span>
+                    <span><strong>Long-form wins:</strong> Posts over 200 characters perform 2.3x better than short posts.</span>
+                </li>
+                <li>
+                    <span class="insight-icon">❤️</span>
+                    <span><strong>Get personal:</strong> Personal/vulnerable content outperforms generic posts by 4.9x.</span>
+                </li>
+                <li>
+                    <span class="insight-icon">🎯</span>
+                    <span><strong>Avoid generic:</strong> Unthemed general posts consistently underperform. Always have a clear angle.</span>
+                </li>
+            </ul>
+        </div>
+
+        <p style="text-align: center; color: #71767b; margin-top: 40px; font-size: 0.875rem;">
+            Generated with X Vizier
+        </p>
+    </div>
+</body>
+</html>
