@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { DeepPostAnalysis } from '@/lib/twitter/types';
+import { formatTweetText } from '@/lib/utils/format-tweet-text';
 
 interface PostsTableProps {
   posts: DeepPostAnalysis[];
@@ -215,8 +216,8 @@ export default function PostsTable({ posts, avgEngagement }: PostsTableProps) {
                         {username.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-white line-clamp-2 leading-relaxed">
-                          {previewText}
+                        <p className="text-sm text-white line-clamp-2 leading-relaxed whitespace-pre-line">
+                          {formatTweetText(previewText)}
                         </p>
                         {post.structure.hasMedia && (
                           <div className="mt-2 w-16 h-16 rounded bg-white/10 border border-white/20 flex items-center justify-center text-xs text-gray-400 overflow-hidden">
