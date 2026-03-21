@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { DeepPostAnalysis } from '@/lib/twitter/types';
-import { formatTweetText } from '@/lib/utils/format-tweet-text';
 
 interface PostCardProps {
   post: DeepPostAnalysis;
@@ -57,8 +56,8 @@ export default function PostCard({ post }: PostCardProps) {
 
       {/* Post Text */}
       <div className="mb-4">
-        <p className="text-gray-200 leading-relaxed whitespace-pre-line">
-          {formatTweetText(displayText)}
+        <p className="text-gray-200 leading-relaxed">
+          {displayText}
         </p>
         {post.text.length > 200 && (
           <button
