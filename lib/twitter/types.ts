@@ -75,3 +75,16 @@ export interface PostAnalysisResponse {
   summary: AnalysisSummary;
 }
 
+export interface DraftScoreResult {
+  overallScore: number;
+  scores: {
+    clarity: number;
+    hook: number;
+    cta: number;
+    formatting: number;
+    length: number;
+  };
+  suggestions: string[];
+  revised: string;
+}
+
