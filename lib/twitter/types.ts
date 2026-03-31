@@ -75,6 +75,12 @@ export interface PostAnalysisResponse {
   summary: AnalysisSummary;
 }
 
+export interface RewriteOption {
+  label: string;
+  strategy: string;
+  text: string;
+}
+
 export interface DraftScoreResult {
   overallScore: number;
   scores: {
@@ -86,5 +92,6 @@ export interface DraftScoreResult {
   };
   suggestions: string[];
   revised: string;
+  options: RewriteOption[];
 }
 
