@@ -8,7 +8,7 @@ interface PostsTableProps {
   avgEngagement: number;
 }
 
-type SortField = 'date' | 'impressions' | 'likes' | 'replies' | 'retweets';
+type SortField = 'date' | 'impressions' | 'likes' | 'replies' | 'retweets' | 'score';
 type SortDirection = 'asc' | 'desc';
 
 export default function PostsTable({ posts, avgEngagement }: PostsTableProps) {
@@ -51,6 +51,10 @@ export default function PostsTable({ posts, avgEngagement }: PostsTableProps) {
         case 'retweets':
           aValue = a.metrics.retweets;
           bValue = b.metrics.retweets;
+          break;
+        case 'score':
+          aValue = a.metrics.weightedScore;
+          bValue = b.metrics.weightedScore;
           break;
         default:
           return 0;
@@ -161,6 +165,16 @@ export default function PostsTable({ posts, avgEngagement }: PostsTableProps) {
                   <SortArrow field="retweets" />
                 </div>
               </th>
+              <th
+                className="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-white transition-colors"
+                onClick={() => handleSort('score')}
+                title="Weighted score using the new X algorithm formula"
+              >
+                <div className="flex items-center justify-end">
+                  Score
+                  <SortArrow field="score" />
+                </div>
+              </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 Top Engagers
               </th>
@@ -255,6 +269,13 @@ export default function PostsTable({ posts, avgEngagement }: PostsTableProps) {
                   <td className="px-6 py-4 whitespace-nowrap text-right">
                     <div className={`text-sm font-medium ${getMetricColor(post.metrics.retweets, avgEngagement)}`}>
                       {formatNumber(post.metrics.retweets)}
+                    </div>
+                  </td>
+
+                  {/* Weighted Score */}
+                  <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <div className="text-sm font-medium text-white">
+                      {formatNumber(Math.round(post.metrics.weightedScore))}
                     </div>
                   </td>
 

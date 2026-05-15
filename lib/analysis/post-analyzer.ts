@@ -1,6 +1,7 @@
 import { Tweet } from '../twitter/analyze-types';
 import { DeepPostAnalysis, AnalysisSummary } from '../twitter/types';
 import { getTweetEngagers } from '../tweetscout/client';
+import { computeWeightedScore } from './weighted-scorer';
 
 export async function analyzePost(
   tweet: Tweet,
@@ -115,6 +116,7 @@ export async function analyzePost(
       impressions,
       engagementRate,
       totalEngagement,
+      weightedScore: computeWeightedScore(tweet, { isThread: type === 'thread' }),
     },
     structure: {
       type,

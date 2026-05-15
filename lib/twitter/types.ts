@@ -26,6 +26,7 @@ export interface DeepPostAnalysis {
     impressions: number;
     engagementRate: number;
     totalEngagement: number;
+    weightedScore: number;
   };
   structure: {
     type: 'single' | 'thread' | 'reply' | 'quote';
