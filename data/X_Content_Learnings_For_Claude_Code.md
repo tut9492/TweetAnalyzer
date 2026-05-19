@@ -26,6 +26,12 @@ Sunday: 4,988 avg | Monday: 3,343 | Friday: 2,781 (worst)
 4. **Announcement + CTA**: "I'm launching [thing]. Who wants to [action]?"
 5. **Vulnerable Honesty**: "[Topic] is stigmatized. [Personal experience]..."
 
+## Style Rules (hard constraints)
+- **No em dashes (—) ever.** Use periods, commas, colons, or parentheses instead. Applies to drafts, rewrites, copy edits, and suggested versions.
+- **No en dashes (–) either.** Same replacements.
+- Hyphens (-) are fine for compound words ("builder-aligned").
+- When breaking a thought, prefer a period. When joining two clauses, prefer a comma or restructure into two sentences.
+
 ## Current Task
 Quote tweeting @anonchain's vulnerable post about wanting a family after seeing a father-son moment at a crypto event.
 
