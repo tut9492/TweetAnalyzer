@@ -4,169 +4,229 @@
 <meta charset="UTF-8">
 <title>AGNT V3 Beta</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    background: #1a1a1a;
+    background: #2a2a2a;
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     padding: 40px;
   }
 
   .card {
     width: 1080px;
     height: 1080px;
-    background: #E5E5E5;
+    background: #0a0a0a;
     position: relative;
-    padding: 80px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    color: #000;
+    overflow: hidden;
+    color: #f5f5f5;
   }
 
-  /* Top: AGNT logo */
+  /* Noise/grain texture */
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 15% 30%, rgba(255, 90, 31, 0.08), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(0, 255, 140, 0.06), transparent 40%);
+    pointer-events: none;
+  }
+
+  /* Top bar — terminal style */
+  .top-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 32px 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: #888;
+    border-bottom: 1px solid #1f1f1f;
+  }
+
+  .top-bar .left { display: flex; gap: 20px; align-items: center; }
+  .top-bar .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00ff8c;
+    box-shadow: 0 0 12px #00ff8c;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Big AGNT logo */
   .logo {
+    position: absolute;
+    top: 110px;
+    left: 56px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 18px;
   }
 
   .logo svg {
-    width: 80px;
-    height: 80px;
+    width: 88px;
+    height: 88px;
   }
 
   .logo-text {
-    font-size: 72px;
-    font-weight: 900;
-    letter-spacing: -3px;
+    font-size: 84px;
+    font-weight: 700;
+    letter-spacing: -4px;
     line-height: 1;
+    color: #f5f5f5;
   }
 
-  /* Middle: thesis */
-  .middle {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 50px;
-    padding: 40px 0;
+  /* Hero closer — the manifesto */
+  .hero {
+    position: absolute;
+    top: 50%;
+    left: 56px;
+    right: 56px;
+    transform: translateY(-50%);
   }
 
-  .label {
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: 4px;
+  .hero-line-1, .hero-line-2 {
+    font-size: 160px;
+    font-weight: 700;
+    letter-spacing: -8px;
+    line-height: 0.92;
     text-transform: uppercase;
-    opacity: 0.5;
   }
 
-  .stats {
+  .hero-line-1 { color: #f5f5f5; }
+  .hero-line-2 {
+    color: #ff5a1f;
+    margin-left: 60px;
+  }
+
+  .hero-comma { color: #ff5a1f; }
+
+  /* Stats — bottom */
+  .stats-row {
+    position: absolute;
+    bottom: 130px;
+    left: 56px;
+    right: 56px;
     display: flex;
-    flex-direction: column;
-    gap: 36px;
+    gap: 60px;
+    font-family: 'Space Mono', monospace;
   }
 
-  .stat {
-    border-left: 6px solid #000;
-    padding-left: 28px;
+  .stat-line {
+    flex: 1;
+    border-left: 3px solid #ff5a1f;
+    padding-left: 18px;
   }
 
   .stat-source {
-    font-size: 20px;
-    font-weight: 600;
-    text-transform: uppercase;
+    font-size: 13px;
     letter-spacing: 2px;
-    opacity: 0.6;
-    margin-bottom: 8px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 6px;
   }
 
   .stat-value {
-    font-size: 56px;
-    font-weight: 900;
-    letter-spacing: -2px;
-    line-height: 1.05;
-  }
-
-  /* Bottom: closer + tut */
-  .bottom {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-  }
-
-  .closer {
-    font-size: 44px;
-    font-weight: 800;
-    letter-spacing: -1.5px;
-    line-height: 1.1;
-    max-width: 70%;
-  }
-
-  .tut {
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 700;
+    color: #f5f5f5;
     letter-spacing: -0.5px;
   }
 
-  .tut sup {
-    font-size: 12px;
-    vertical-align: super;
+  /* Bottom bar */
+  .bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 32px 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: #888;
+    border-top: 1px solid #1f1f1f;
   }
 
-  /* V3 Beta tag */
-  .version-tag {
-    position: absolute;
-    top: 80px;
-    right: 80px;
-    font-size: 16px;
+  .anti-suits {
+    color: #ff5a1f;
     font-weight: 700;
-    letter-spacing: 3px;
-    border: 2px solid #000;
-    padding: 8px 16px;
     text-transform: uppercase;
+    letter-spacing: 3px;
   }
+
+  .tut {
+    font-family: 'Space Grotesk', sans-serif;
+    color: #f5f5f5;
+    font-weight: 700;
+    font-size: 18px;
+  }
+  .tut sup { font-size: 10px; vertical-align: super; }
 </style>
 </head>
 <body>
   <div class="card">
-    <!-- Top: AGNT logo -->
+
+    <!-- Top bar -->
+    <div class="top-bar">
+      <div class="left">
+        <div class="dot"></div>
+        <span>AGNT.V3.BETA // LIVE SOON</span>
+      </div>
+      <div class="right">SYSTEM: AGENT_ECONOMY</div>
+    </div>
+
+    <!-- Logo -->
     <div class="logo">
       <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="36" stroke="#000" stroke-width="10" fill="none"/>
-        <rect x="30" y="22" width="40" height="10" fill="#000"/>
+        <circle cx="50" cy="50" r="36" stroke="#f5f5f5" stroke-width="10" fill="none"/>
+        <rect x="30" y="22" width="40" height="10" fill="#f5f5f5"/>
       </svg>
       <div class="logo-text">AGNT</div>
     </div>
 
-    <div class="version-tag">V3 BETA</div>
+    <!-- Hero manifesto line -->
+    <div class="hero">
+      <div class="hero-line-1">When we grow<span class="hero-comma">,</span></div>
+      <div class="hero-line-2">you grow.</div>
+    </div>
 
-    <!-- Middle: stats -->
-    <div class="middle">
-      <div class="label">The Agentic Economy</div>
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-source">McKinsey</div>
-          <div class="stat-value">$3–5 Trillion<br/>by 2030</div>
-        </div>
-        <div class="stat">
-          <div class="stat-source">Tether</div>
-          <div class="stat-value">Trillion-Agent<br/>Economy</div>
-        </div>
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-line">
+        <div class="stat-source">// McKinsey</div>
+        <div class="stat-value">$3–5T agentic economy by 2030</div>
+      </div>
+      <div class="stat-line">
+        <div class="stat-source">// Tether</div>
+        <div class="stat-value">Trillion-agent economy on web3</div>
       </div>
     </div>
 
-    <!-- Bottom: closer + tut -->
-    <div class="bottom">
-      <div class="closer">When we grow,<br/>you grow.</div>
+    <!-- Bottom bar -->
+    <div class="bottom-bar">
+      <div class="anti-suits">&gt; NO SUITS. NO EXTRACTION.</div>
       <div class="tut">tut<sup>TM</sup></div>
     </div>
+
   </div>
 </body>
 </html>
