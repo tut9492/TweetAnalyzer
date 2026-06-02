@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <title>AGNT V3 Beta</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    background: #2a2a2a;
+    background: #222;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -19,212 +19,266 @@
   }
 
   .card {
-    width: 1080px;
-    height: 1080px;
-    background: #0a0a0a;
+    width: 1000px;
+    height: 1000px;
+    background: linear-gradient(135deg, #fff7ec 0%, #fdebf0 55%, #fad6e3 100%);
     position: relative;
     overflow: hidden;
-    color: #f5f5f5;
+    color: #0a0a0a;
+    font-family: 'Space Grotesk', sans-serif;
   }
 
-  /* Noise/grain texture */
+  /* Dot grid */
   .card::before {
     content: '';
     position: absolute;
     inset: 0;
-    background-image:
-      radial-gradient(circle at 15% 30%, rgba(255, 90, 31, 0.08), transparent 40%),
-      radial-gradient(circle at 85% 80%, rgba(0, 255, 140, 0.06), transparent 40%);
+    background-image: radial-gradient(circle, rgba(0,0,0,0.18) 1px, transparent 1.5px);
+    background-size: 14px 14px;
+    opacity: 0.4;
     pointer-events: none;
   }
 
-  /* Top bar — terminal style */
-  .top-bar {
+  /* Top status row */
+  .top {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 32px 56px;
+    top: 36px;
+    left: 36px;
+    right: 36px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-family: 'Space Mono', monospace;
-    font-size: 14px;
-    letter-spacing: 1px;
-    color: #888;
-    border-bottom: 1px solid #1f1f1f;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    z-index: 5;
   }
 
-  .top-bar .left { display: flex; gap: 20px; align-items: center; }
-  .top-bar .dot {
+  .top-left {
+    color: #e6126e;
+    text-transform: uppercase;
+  }
+
+  .top-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #0a0a0a;
+  }
+
+  .top-right .dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #00ff8c;
-    box-shadow: 0 0 12px #00ff8c;
-    animation: pulse 1.6s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
+    background: #00b46a;
+    box-shadow: 0 0 8px rgba(0, 180, 106, 0.6);
   }
 
-  /* Big AGNT logo */
-  .logo {
-    position: absolute;
-    top: 110px;
-    left: 56px;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-  }
-
-  .logo svg {
-    width: 88px;
-    height: 88px;
-  }
-
-  .logo-text {
-    font-size: 84px;
-    font-weight: 700;
-    letter-spacing: -4px;
-    line-height: 1;
-    color: #f5f5f5;
-  }
-
-  /* Hero closer — the manifesto */
+  /* Central AGNT word with layered shadow */
   .hero {
     position: absolute;
     top: 50%;
-    left: 56px;
-    right: 56px;
-    transform: translateY(-50%);
+    left: 50%;
+    transform: translate(-50%, -54%);
+    text-align: center;
+    z-index: 4;
   }
 
-  .hero-line-1, .hero-line-2 {
-    font-size: 160px;
+  .agnt-stack {
+    position: relative;
+    display: inline-block;
+    line-height: 1;
+  }
+
+  .agnt-stack span {
+    font-family: 'Space Grotesk', sans-serif;
     font-weight: 700;
-    letter-spacing: -8px;
-    line-height: 0.92;
-    text-transform: uppercase;
+    font-size: 340px;
+    letter-spacing: -18px;
+    display: block;
+    line-height: 0.85;
   }
 
-  .hero-line-1 { color: #f5f5f5; }
-  .hero-line-2 {
-    color: #ff5a1f;
-    margin-left: 60px;
-  }
-
-  .hero-comma { color: #ff5a1f; }
-
-  /* Stats — bottom */
-  .stats-row {
+  .agnt-shadow-3 {
     position: absolute;
-    bottom: 130px;
-    left: 56px;
-    right: 56px;
+    top: 22px;
+    left: 26px;
+    color: #fad6e3;
+    z-index: 1;
+  }
+  .agnt-shadow-2 {
+    position: absolute;
+    top: 14px;
+    left: 18px;
+    color: #ffd4a8;
+    z-index: 2;
+  }
+  .agnt-shadow-1 {
+    position: absolute;
+    top: 7px;
+    left: 9px;
+    color: #ff8fb1;
+    z-index: 3;
+  }
+  .agnt-main {
+    position: relative;
+    color: #0a0a0a;
+    z-index: 4;
+  }
+
+  /* V3 BETA stamp */
+  .stamp {
+    position: absolute;
+    top: calc(50% + 200px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: #0a0a0a;
+    padding: 8px 18px;
+    background: rgba(255, 255, 255, 0.4);
+    border: 1.5px solid #0a0a0a;
+    border-radius: 4px;
+    z-index: 5;
+  }
+
+  /* Stats row */
+  .stats {
+    position: absolute;
+    bottom: 170px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
-    gap: 60px;
-    font-family: 'Space Mono', monospace;
+    gap: 36px;
+    font-family: 'JetBrains Mono', monospace;
+    z-index: 5;
+    text-align: center;
   }
 
-  .stat-line {
-    flex: 1;
-    border-left: 3px solid #ff5a1f;
-    padding-left: 18px;
+  .stat {
+    padding: 14px 22px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1.5px solid #0a0a0a;
+    border-radius: 10px;
   }
 
-  .stat-source {
-    font-size: 13px;
+  .stat-label {
+    font-size: 11px;
     letter-spacing: 2px;
+    color: #e6126e;
     text-transform: uppercase;
-    color: #888;
-    margin-bottom: 6px;
-  }
-
-  .stat-value {
-    font-size: 24px;
+    margin-bottom: 4px;
     font-weight: 700;
-    color: #f5f5f5;
-    letter-spacing: -0.5px;
+  }
+  .stat-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0a0a0a;
+    letter-spacing: -0.3px;
   }
 
-  /* Bottom bar */
-  .bottom-bar {
+  /* Closer */
+  .closer {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 32px 56px;
+    bottom: 140px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: #0a0a0a;
+    letter-spacing: -1.5px;
+    z-index: 5;
+  }
+
+  /* Bottom pill row */
+  .bottom {
+    position: absolute;
+    bottom: 36px;
+    left: 36px;
+    right: 36px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-family: 'Space Mono', monospace;
-    font-size: 14px;
-    letter-spacing: 1px;
-    color: #888;
-    border-top: 1px solid #1f1f1f;
+    z-index: 5;
   }
 
-  .anti-suits {
-    color: #ff5a1f;
+  .pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1.5px solid #0a0a0a;
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 3px;
+    letter-spacing: 1.5px;
+    background: rgba(255, 255, 255, 0.5);
+    color: #0a0a0a;
   }
+
+  .pill .pill-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .pill-dot.pink { background: #e6126e; }
+  .pill-dot.blue { background: #2768f3; }
 
   .tut {
     font-family: 'Space Grotesk', sans-serif;
-    color: #f5f5f5;
-    font-weight: 700;
     font-size: 18px;
+    font-weight: 700;
+    color: #0a0a0a;
   }
   .tut sup { font-size: 10px; vertical-align: super; }
+
 </style>
 </head>
 <body>
   <div class="card">
 
-    <!-- Top bar -->
-    <div class="top-bar">
-      <div class="left">
+    <!-- Top status -->
+    <div class="top">
+      <div class="top-left">V3.BETA // LIVE SOON</div>
+      <div class="top-right">
         <div class="dot"></div>
-        <span>AGNT.V3.BETA // LIVE SOON</span>
+        <span>MY.AGNT.SOCIAL</span>
       </div>
-      <div class="right">SYSTEM: AGENT_ECONOMY</div>
     </div>
 
-    <!-- Logo -->
-    <div class="logo">
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="36" stroke="#f5f5f5" stroke-width="10" fill="none"/>
-        <rect x="30" y="22" width="40" height="10" fill="#f5f5f5"/>
-      </svg>
-      <div class="logo-text">AGNT</div>
-    </div>
-
-    <!-- Hero manifesto line -->
+    <!-- AGNT layered word -->
     <div class="hero">
-      <div class="hero-line-1">When we grow<span class="hero-comma">,</span></div>
-      <div class="hero-line-2">you grow.</div>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-row">
-      <div class="stat-line">
-        <div class="stat-source">// McKinsey</div>
-        <div class="stat-value">$3–5T agentic economy by 2030</div>
-      </div>
-      <div class="stat-line">
-        <div class="stat-source">// Tether</div>
-        <div class="stat-value">Trillion-agent economy on web3</div>
+      <div class="agnt-stack">
+        <span class="agnt-shadow-3">AGNT</span>
+        <span class="agnt-shadow-2">AGNT</span>
+        <span class="agnt-shadow-1">AGNT</span>
+        <span class="agnt-main">AGNT</span>
       </div>
     </div>
 
-    <!-- Bottom bar -->
-    <div class="bottom-bar">
-      <div class="anti-suits">&gt; NO SUITS. NO EXTRACTION.</div>
+    <!-- V3 stamp -->
+    <div class="stamp">V3 · BETA</div>
+
+    <!-- Closer -->
+    <div class="closer">when we grow, you grow.</div>
+
+    <!-- Bottom pills -->
+    <div class="bottom">
+      <div class="pill">
+        <div class="pill-dot pink"></div>
+        <span>EVERYONE GETS AN AGENT</span>
+      </div>
       <div class="tut">tut<sup>TM</sup></div>
+      <div class="pill">
+        <div class="pill-dot blue"></div>
+        <span>ERC-8004 · ONCHAIN</span>
+      </div>
     </div>
 
   </div>
