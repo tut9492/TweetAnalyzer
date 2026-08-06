@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The 5 Tiers · RWA Bull Thesis</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Space Grotesk', sans-serif;
+    padding: 40px;
+  }
+
+  .card-frame {
+    width: 1920px;
+    height: 1080px;
+    background:
+      radial-gradient(circle at 92% 20%, rgba(255, 92, 141, 0.10), transparent 45%),
+      radial-gradient(circle at 8% 85%, rgba(255, 175, 45, 0.06), transparent 50%),
+      #0a0a0a;
+    position: relative;
+    overflow: hidden;
+    color: #f5f5f5;
+    padding: 60px 72px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  /* Top strip */
+  .top-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 15px;
+    letter-spacing: 2px;
+    color: #888;
+    text-transform: uppercase;
+  }
+
+  .top-strip .left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .top-strip .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ff5c8d;
+    box-shadow: 0 0 12px rgba(255, 92, 141, 0.7);
+  }
+
+  .top-strip .agnt-mark svg {
+    width: 34px;
+    height: 34px;
+  }
+
+  /* Headline block */
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-top: 16px;
+  }
+
+  h1 {
+    font-size: 116px;
+    font-weight: 700;
+    letter-spacing: -6px;
+    line-height: 0.92;
+    background: linear-gradient(90deg, #ffffff 0%, #ffffff 20%, #ff5c8d 45%, #ff9a4d 70%, #ffd54a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .subhead {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px;
+    color: #b5b5b5;
+    letter-spacing: 0.2px;
+    line-height: 1.4;
+    max-width: 1400px;
+  }
+
+  .subhead strong { color: #ffffff; font-weight: 700; }
+  .subhead .accent { color: #ff5c8d; }
+
+  /* Tier row */
+  .row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 22px;
+    padding: 0 0 14px 0;
+  }
+
+  .tier {
+    position: relative;
+    background: #111111;
+    border: 1px solid #1e1e1e;
+    border-radius: 22px;
+    padding: 32px 26px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    min-height: 460px;
+  }
+
+  .tier .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .tier-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: #808080;
+    text-transform: uppercase;
+  }
+
+  .chip {
+    font-family: 'Space Mono', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1.5px solid;
+  }
+
+  .tier-name {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1.02;
+    color: #ffffff;
+  }
+
+  .icons {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 0 4px 0;
+    font-size: 26px;
+    font-weight: 700;
+    color: #d0d0d0;
+  }
+
+  .icons .pill {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    border: 1.5px solid #2a2a2a;
+  }
+
+  .value {
+    font-size: 62px;
+    font-weight: 700;
+    letter-spacing: -3px;
+    line-height: 1;
+    margin-top: auto;
+  }
+
+  .note {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.2px;
+    color: #888;
+    line-height: 1.4;
+    min-height: 34px;
+  }
+
+  /* Color themes by tier */
+  .t1 { border-color: #2a2a2a; }
+  .t1 .chip { color: #b5b5b5; border-color: #444; }
+  .t1 .value { color: #f5f5f5; }
+
+  .t2 { border-color: #3a2934; box-shadow: 0 0 0 1px rgba(255, 92, 141, 0.08) inset; }
+  .t2 .chip { color: #ff8ab0; border-color: #ff5c8d55; }
+  .t2 .value { color: #ff8ab0; }
+
+  .t3 { border-color: #ff5c8d55; box-shadow: 0 0 40px rgba(255, 92, 141, 0.10) inset; }
+  .t3 .chip { color: #ff5c8d; border-color: #ff5c8d; background: rgba(255, 92, 141, 0.06); }
+  .t3 .value { color: #ff5c8d; text-shadow: 0 0 22px rgba(255, 92, 141, 0.35); }
+
+  .t4 { border-color: #ff9a4d55; box-shadow: 0 0 40px rgba(255, 154, 77, 0.10) inset; }
+  .t4 .chip { color: #ff9a4d; border-color: #ff9a4d; background: rgba(255, 154, 77, 0.06); }
+  .t4 .value { color: #ff9a4d; text-shadow: 0 0 22px rgba(255, 154, 77, 0.35); }
+
+  .t5 { border-color: #ffd54a55; box-shadow: 0 0 60px rgba(255, 213, 74, 0.14) inset; background: linear-gradient(180deg, #131109 0%, #111111 60%); }
+  .t5 .chip { color: #ffd54a; border-color: #ffd54a; background: rgba(255, 213, 74, 0.08); }
+  .t5 .value { color: #ffd54a; text-shadow: 0 0 26px rgba(255, 213, 74, 0.45); }
+  .t5 .tier-name { color: #ffffff; }
+
+  /* Bullet list for tier 5 */
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 4px;
+  }
+  .stack .item {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: #d0d0d0;
+    letter-spacing: 0.2px;
+  }
+  .stack .item::before {
+    content: "› ";
+    color: #ffd54a;
+    font-weight: 700;
+  }
+
+  /* Bottom strip */
+  .bottom-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 15px;
+    letter-spacing: 2px;
+    color: #888;
+    text-transform: uppercase;
+  }
+
+  .bottom-strip .brand strong { color: #ff5c8d; font-weight: 700; }
+</style>
+</head>
+<body>
+  <div class="card-frame">
+
+    <!-- Top strip -->
+    <div class="top-strip">
+      <div class="left">
+        <div class="dot"></div>
+        <span>AGNT · RWA Bull Thesis</span>
+      </div>
+      <div class="agnt-mark">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="36" stroke="#ff5c8d" stroke-width="8" fill="none"/>
+          <rect x="30" y="22" width="40" height="8" fill="#ff5c8d"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Headline -->
+    <div class="head">
+      <h1>The 5 Tiers</h1>
+      <div class="subhead">
+        Buy <strong>$100</strong> of <strong>$BEER</strong>, paired to <strong>$AAPL</strong> on Robinhood Chain via <span class="accent">ERC-8056</span>. Each tier stacks on the last, unlocking a new asset class.
+      </div>
+    </div>
+
+    <!-- 5 Tiers -->
+    <div class="row">
+
+      <!-- TIER 1 -->
+      <div class="tier t1">
+        <div class="top">
+          <div class="tier-label">Tier 01</div>
+          <div class="chip">×5</div>
+        </div>
+        <div class="tier-name">Standard crypto</div>
+        <div class="icons"><span class="pill">🟩</span></div>
+        <div class="value">$500</div>
+        <div class="note">Token goes 5x. Base case, every crypto since 2017.</div>
+      </div>
+
+      <!-- TIER 2 -->
+      <div class="tier t2">
+        <div class="top">
+          <div class="tier-label">Tier 02</div>
+          <div class="chip">×5</div>
+        </div>
+        <div class="tier-name">RWA appreciation</div>
+        <div class="icons"><span class="pill">🍎</span></div>
+        <div class="value">$500</div>
+        <div class="note">Token holds. $AAPL goes 5x. Value rides the equity.</div>
+      </div>
+
+      <!-- TIER 3 -->
+      <div class="tier t3">
+        <div class="top">
+          <div class="tier-label">Tier 03</div>
+          <div class="chip">×25</div>
+        </div>
+        <div class="tier-name">The Double Moon</div>
+        <div class="icons"><span class="pill">🟩</span> <span>+</span> <span class="pill">🍎</span></div>
+        <div class="value">$2,500</div>
+        <div class="note">Both $BEER and $AAPL 5x. Sides compound. Real math.</div>
+      </div>
+
+      <!-- TIER 4 -->
+      <div class="tier t4">
+        <div class="top">
+          <div class="tier-label">Tier 04</div>
+          <div class="chip">+ DIV</div>
+        </div>
+        <div class="tier-name">Dividend passthrough</div>
+        <div class="icons"><span class="pill">🍎</span> <span>›</span> <span class="pill">💵</span></div>
+        <div class="value">$2,500+</div>
+        <div class="note">Apple pays dividends. $AAPL multiplier updates onchain. Value flows through the pair.</div>
+      </div>
+
+      <!-- TIER 5 -->
+      <div class="tier t5">
+        <div class="top">
+          <div class="tier-label">Tier 05</div>
+          <div class="chip">STACK</div>
+        </div>
+        <div class="tier-name">The LP Compound</div>
+        <div class="stack">
+          <div class="item">Trading fees</div>
+          <div class="item">$BEER upside</div>
+          <div class="item">$AAPL upside</div>
+          <div class="item">Dividend accrual</div>
+        </div>
+        <div class="value">∞</div>
+        <div class="note">Every stream stacks. Entirely new asset class.</div>
+      </div>
+
+    </div>
+
+    <!-- Bottom strip -->
+    <div class="bottom-strip">
+      <div>› Onchain RWA · Robinhood Chain · ERC-8056</div>
+      <div class="brand">Powered by <strong>AGNT</strong> · AGNT.social</div>
+    </div>
+
+  </div>
+</body>
+</html>
